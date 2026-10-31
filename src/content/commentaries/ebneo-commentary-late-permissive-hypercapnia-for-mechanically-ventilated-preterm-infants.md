@@ -1,0 +1,80 @@
+---
+title: "EBNEO Commentary: Late Permissive Hypercapnia for Mechanically Ventilated Preterm Infants"
+slug: "ebneo-commentary-late-permissive-hypercapnia-for-mechanically-ventilated-preterm-infants"
+publish_date: 2025-09-03
+investigation: "Prevention"
+pmid: ""
+doi: ""
+reviewer_email: "Thomas.Raffay@uhhospitals.org"
+status: published
+---
+## Citation
+
+Travers CP, Gentle SJ, Shukla VV, Aban I, Yee AJ, Armstead KM, Benz RL, Laney D, Ambalavanan N, Carlo WA. Late Permissive Hypercapnia for Mechanically Ventilated Preterm Infants: A Randomized Trial. Pediatr Pulmonol 2025; 60(6): e71165. PMID: 40525736
+
+## Reviewed By
+
+Thomas M Raffay, MD  
+Associate Professor of Pediatrics, Case Western Reserve University  
+Attending Neonatologist, UH Rainbow Babies & Children’s Hospital  
+Thomas.Raffay@uhhospitals.org
+
+Rita M Ryan, MD  
+Professor of Pediatrics, Case Western Reserve University  
+Senior Attending Neonatologist, UH Rainbow Babies & Children’s Hospital  
+Rita.Ryan@uhhospitals.org
+
+## Investigation
+
+Prevention
+
+## Question
+
+In preterm neonates (22-36 weeks gestation) mechanically ventilated for respiratory distress syndrome on postnatal day 7-14 (P), does targeting higher levels of pH-controlled permissive hypercapnia (pH ≥ 7.20 and PCO2 60-75 mmHg) (I) compared to lower levels of pH-controlled permissive hypercapnia (≥ 7.25 and 40-55 mmHg) (C) increase the number of days alive and ventilator-free (O) in the 28 days after randomization (T)?
+
+## Methods
+
+• Design: This was a single-center, non-blinded, randomized clinical trial with parallel group allocation. Patients were enrolled over 65-months from December 2015 to August 2021. The first infant was enrolled in December 2015 under the Institutional Review Board approved protocol and the trial and same protocol was registered through Clinicaltrials.gov (NCT02799875) in June 2016.  
+• Allocation: Eligible participants were randomly assigned to higher or lower levels of pH-controlled permissive hypercapnia with a 1:1 parallel allocation. Randomization was stratified by gestational age at birth (22–25 weeks’ gestation, 26–28 weeks’ gestation, or 29–36 weeks’ gestation) and multiples were enrolled in the same group if more than one infant was eligible for the study. Block sizes of two to six were computer generated, and group assignment was contained in sequentially numbered opaque sealed envelopes.  
+• Blinding: Target intervention was not masked given the multitude of clinically indicated ventilator adjustments based on transcutaneous carbon dioxide (TcCO2) monitors used in routine care. However, outcome data were blinded until the last patient had been enrolled and discharged from the hospital. Analyses were performed by a statistician masked to group assignment.  
+• Follow-up period: The primary outcome of number of days alive and ventilator‐free was followed at 28 days after randomization. Other outcomes were recorded until hospital discharge. Developmental outcomes at 22–26 months were recorded among those participants who attended follow‐up clinic.  
+• Setting: The study was conducted at a single tertiary regional Level IV neonatal intensive care unit in the United States of America.  
+• Patients: All preterm neonates from 22 weeks and 0 days to 36 weeks and 6 days of gestational age, who were mechanically ventilated on postnatal day 7–14 for initial clinical and radiographic respiratory distress syndrome, who were inborn or transferred in before postnatal day 7 were eligible. There was no minimum duration of ventilation before enrollment and infants could be enrolled if meeting criteria at any time from postnatal day 7–14. Exclusion criteria included major congenital malformations or neuromuscular conditions affecting respiration, infants with a terminal illness or decision to withdraw or limit care, or if the parents had refused or withdrawn informed consent.  
+• Intervention: Neonates were randomized to two different pH and PCO2 targets. The higher permissive hypercapnia group were ≥ 7.20 and 60-75 mmHg, respectively. The pH and PCO2 targets in the lower permissive hypercapnia group were ≥ 7.25 and 40-55 mmHg, respectively. Either arterial or capillary blood gas pH and PCO2 were utilized and continuous TcCO2 monitors were used routinely. The TcCO2 target range was adjusted based on the most recent correlation with the blood gas. The TcCO2 upper alarm limit was set to avoid a pH less than the target or to the maximum intended PCO2 for that assigned group. The lower alarm limit was then set 15–20 mmHg less than this upper alarm limit. Infants remained in their assigned target group for 28 days after enrollment.  
+• Outcomes:  
+• Primary outcome: The primary outcome was the number of days alive and ventilator‐free in the 28 days after randomization. Infants in both groups could be extubated to noninvasive positive pressure when they met all criteria: SpO2 ≥ 88% with FiO2 ≤ 0.50; conventional ventilator rate ≤ 20 breaths per minute; mean airway pressure (MAP) < 8 cmH2O; amplitude < 2 times the MAP if on high frequency oscillator; and hemodynamically stable (clinically acceptable blood pressure and perfusion per clinical team). In addition, infants in the higher group could be extubated if they had a pH ≥ 7.20 and PCO2 ≤ 75 mmHg, while infants in the lower group could be extubated if they had a pH ≥ 7.25 and PCO2 ≤ 55 mmHg. Infants in both groups could be reintubated if they met any of the following criteria: SpO2 ≤ 88% with FiO2 ≥ 0.80 for ≥ 1 h (presumed typo in original manuscript); repetitive apnea requiring bag and mask ventilation > 1 per hour; clinically defined shock; sepsis; required for surgery; or hemodynamically unstable. In addition, infants in the higher group could be reintubated if they had a pH < 7.20 or a PCO2 > 75 mmHg, whereas infants in the lower group could be reintubated if they had a pH < 7.25 or a PCO2 > 55 mmHg. An algorithm for out of range carbon dioxide levels while on mechanical ventilation suggested the type of ventilator change but not its magnitude. Although the algorithm was based primarily on carbon dioxide measurements, clinical assessments were performed simultaneously. For PCO2 elimination, a higher rate was favored over higher pressures in both groups. Hypoxemia was improved primarily by increasing the FiO2 if the FiO2 was ≤ 0.40, if between 0.40 and 0.70 the treating clinician could increase the MAP or FiO2, and if the FiO2 was ≥ 0.70 oxygenation was improved predominantly by increasing the MAP.  
+• Secondary outcomes: Secondary outcomes included hospital mortality, grade 2–3 bronchopulmonary dysplasia (BPD), use of postnatal steroids for BPD, pulmonary hypertension diagnosed on routine echocardiography at 28 days ± 7 days, presence of a hemodynamically significant patent ductus arteriosus, weight and head circumference indices during the 28 day intervention period, the number of days on respiratory support in the 28 days after randomization, number of reintubations during the 28 days, stage ≥ 2 necrotizing enterocolitis, late intraventricular hemorrhage, and severe neurodevelopmental impairment (NDI) for those who attended follow-up at 22-26 months. Investigators also collected daily data on pH, PCO2, MAP, ventilator rate, and FiO2 during the randomization period.  
+• Analysis and Sample Size: All analyses were planned a priori and by intention to treat by a statistician masked to group assignment. A sample size of 130 infants was required to demonstrate a (mean ± standard deviation) 4 ± 7 day increase in the primary outcome of number of alive ventilator‐free days in the 28 days after randomization with a reported power of 90% and significance level of 0.05. For the count outcome of number of days free of ventilation the analysis used a Poisson regression with log link function using the total number of days in the study for the first 28 days as an offset. For comparing the time to death in the 28‐day period, a shared frailty proportional hazard model was used to account for intra‐cluster dependence in the presence of censoring.  
+• Patient follow-up: 275 neonates were screened and 130 out of 236 neonates were eligible and randomized (55%). All 130 enrolled infants completed the study. The follow‐up rate for formal neurodevelopmental assessment at 22–26 months postmenstrual age was 79.2% and did not differ between groups.
+
+## Main Results
+
+The gestational age (mean ± SD) of study participants was 24 weeks and 5 days ± 2 weeks and 0 days and birthweight of 657 ± 198 grams. Baseline characteristics and clinical demographics did not differ between groups, with the exception that more multiples were randomized to the lower group. Infants randomized to higher levels of pH‐controlled permissive hypercapnia had more alive ventilator‐free days than infants randomized to lower levels of pH‐controlled permissive hypercapnia (11 ± 10 days vs. 6 ± 8; mean ± SD; p = 0.009). The daily pH and PCO2 (mean ± SD) was 7.31 ± 0.07 and 55 ± 10 mmHg in the higher group vs. 7.32 ± 0.07 and 52 ± 8 mmHg in the lower group; which differed significantly between groups after study entry (all p < 0.05). The daily ventilator rate and FiO2 were both decreased in the higher group compared with the lower group (all p < 0.05). The daily mean airway pressure did not differ. Grade 2–3 bronchopulmonary dysplasia or death before discharge was not significantly lower in the higher PCO2 group (30/62 (44%) vs. 45/68 (59%); adjusted odds ratio (aOR) 0.54, 95% confidence intervals (CI) 0.27–1.08; p = 0.08). Grade 2–3 bronchopulmonary dysplasia among survivors at 36 weeks’ postmenstrual age did not differ significantly (higher PCO2 35% vs. lower PCO2 50%; aOR 0.56, 95% CI 0.27–1.13; p = 0.12). Adverse outcomes, including rates of neurodevelopmental impairment, did not significantly differ between groups.
+
+## Conclusion
+
+Targeting higher levels of pH-controlled permissive hypercapnia starting from postnatal day 7–14 increased the number of days alive and ventilator‐free during the 28 days after enrollment without a significant difference detected in BPD or other adverse outcomes.
+
+## Commentary
+
+Travers et al report in their randomized trial performed in preterm neonates that targeting higher pH-controlled permissive hypercapnia (pH ≥ 7.20 and PCO2 60-75 mmHg) compared to lower (≥ 7.25 and 40-55 mmHg) from postnatal day 7-14 increased the number of days alive and ventilator-free during the 28 days after randomization without a significant difference detected in BPD or other adverse outcomes (1). The authors’ term “pH-controlled” permissive hypercapnia implies concern for a very abnormal pH being detrimental to the developing lung or other organs. While their Discussion focused on the multiple RCTs of permissive hypercapnia (2), the effect of pH on the developing body is an important consideration. Cell biology studies indicate acidosis alters the cell cycle, gene expression, metabolism, and can initiate stem cell death (3). Indeed, early acidosis (first 72hrs) has been associated with adverse NICU outcomes (4,5). Additional recent human studies examined the association of postnatal acidosis in the first two weeks and suggest a lower pH is associated with an increased risk of BPD (6,7). In a randomized trial, the use of sodium acetate in parenteral nutrition compared with sodium chloride resulted in a higher base excess and a four-fold lower rate of BPD (8). Perhaps Travers et al were aware of these pH studies and wanted to be sure not to put their enrolled subjects at a potentially increased risk for BPD.
+
+The notable a priori choice for a continuous primary outcome (number of days alive and ventilator-free during the 28 days after enrollment) allowed for a lower sample size. The perhaps more important “yes/no” combined outcome of death or BPD, while different (59% vs. 44%), did not reach statistical significance. Assuming an equal distribution of 65 subjects/group, their study only had 30% power to detect significance at the observed 15% absolute risk difference. Had death/BPD been chosen a priori, the sample size needed to not miss an absolute difference of 15% would have been 173 per group (α=0.05, 80% power, Vanderbilt Power and Sample Size Calculator).
+
+The inability to blind in any study can be a limitation. Could the TcCO2 monitor have had an offset similar to the methods used in the SUPPORT trial with a 3% SpO2 offset (9)? In this scenario, babies and their TcCO2 monitors would be randomized to 10 above or 10 below the actual TcCO2 target. However, it would have been quite difficult to do something similar for laboratory blood gas PCO2 measurements as well.
+
+Finally, this study demonstrates the challenges in studying higher vs. lower targets. Often the difference is not as large as that designed by the study. In this case, one would have expected an average PCO2 difference of 20, but the actual difference between overall group means was only 3 torr. Similarly, this challenge has impacted trials targeting oxygen saturation, as those randomized to the lower SpO2 target group in SUPPORT achieved saturations higher than that targeted (9). Likely representing an intersection between a neonate’s own respiratory drive in response to hypercarbia and a practitioner’s tendencies to direct patient care towards perceived norms.
+
+The authors should be commended for their careful study examining the effects of pH-controlled PCO2 targets. While the BPD outcome itself was not significant, it is certainly tantalizing. No doubt this group will be using these data to spearhead a larger multicenter study. Kudos also for having the foresight and patience to include neurodevelopmental follow-up which showed no harm, highlighting the potential benefits in targeting permissive hypercapnia for both ventilator management and guiding decisions such as extubations or reintubations.
+
+## References
+
+1\. Travers CP, Gentle SJ, Shukla VV, Aban I, Yee AJ, Armstead KM, et al. Late Permissive Hypercapnia for Mechanically Ventilated Preterm Infants: A Randomized Trial. Pediatr Pulmonol 2025 Jun; 60(6): e71165.  
+ 2\. Ozawa Y, Miyake F, Isayama T. Efficacy and safety of permissive hypercapnia in preterm infants: A systematic review. Pediatr Pulmonol 2022 Nov; 57(11): 2603-2613.  
+ 3\. Liu W, Ren Z, Lu K, Song C, Cheung ECW, Zhou Z, et al. The Suppression of Medium Acidosis Improves the Maintenance and Differentiation of Human Pluripotent Stem Cells at High Density in Defined Cell Culture Medium. Int J Biol Sci 2018 Apr 5; 14(5): 485-496.  
+ 4\. Brown MK, Poeltler DM, Hassen KO, Lazarus DV, Brown VK, Stout JJ, et al. Incidence of Hypocapnia, Hypercapnia, and Acidosis and the Associated Risk of Adverse Events in Preterm Neonates. Respir Care 2018 Aug; 63(8): 943-949.  
+ 5\. Goswami IR, Abou Mehrem A, Scott J, Esser MJ, Mohammad K. Metabolic acidosis rather than hypo/hypercapnia in the first 72 hours of life associated with intraventricular hemorrhage in preterm neonates. J Matern Fetal Neonatal Med 2021 Dec; 34(23): 3874-3882.  
+ 6\. Notz L, Adams M, Bassler D, Boos V. Association between early metabolic acidosis and bronchopulmonary dysplasia/death in preterm infants born at less than 28 weeks’ gestation: an observational cohort study. BMC Pediatr 2024 Sep; 24(1): 605.  
+ 7\. Shin TW, Lee EJ, Choi HW, Yoo YM. Metabolic acidosis as a risk factor for bronchopulmonary dysplasia in preterm infants born between 23 + 0 and 31 + 6 weeks of gestation: a retrospective case-control study. Front Pediatr 2025 Jun; 13: 1595348.  
+ 8\. Ali A, Ong EY, Sadu Singh BK, Cheah FC. Comparison Between Sodium Acetate and Sodium Chloride in Parenteral Nutrition for Very Preterm Infants on the Acid-Base Status and Neonatal Outcomes. Pediatr Gastroenterol Hepatol Nutr 2020 Jul; 23(4): 377-387.  
+ 9\. SUPPORT Study Group of the Eunice Kennedy Shriver NICHD Neonatal Research Network; Carlo WA, Finer NN, Walsh MC, Rich W, Gantz MG, Laptook AR, et al. Target ranges of oxygen saturation in extremely preterm infants. N Engl J Med 2010 May; 362(21): 1959-69.

@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const items = (await getCollection('commentaries')).filter((c) => c.data.status !== 'draft');
+  return items.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const d = entry.data;
+const date = d.publish_date
+  ? new Date(d.publish_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
+  : null;
+---
+<Base title={d.title.replace(/^EBNEO\s+Commentary:?\s*/i, '')}>
+  <section class="panel">
+    <p class="breadcrumb"><a href="/reviews/">← All reviews</a></p>
+    <article class="article">
+      <h1>{d.title}</h1>
+      <p class="byline">
+        {date && <span>{date}</span>}
+        {d.investigation && <span class="tag">{d.investigation}</span>}
+        {d.pmid && <span>· PMID <a href={`https://pubmed.ncbi.nlm.nih.gov/${d.pmid}/`} rel="noopener">{d.pmid}</a></span>}
+        {d.doi && <span>· DOI {d.doi}</span>}
+      </p>
+      <Content />
+      <p style="margin-top:32px">
+        <a class="btn" href="/reviews/"><Icon name="file" /> Back to all reviews</a>
+      </p>
+    </article>
+  </section>
+</Base>

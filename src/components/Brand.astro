@@ -1,0 +1,20 @@
+---
+// EBNEO logo mark: a rounded clinical badge containing an ECG/heartbeat trace that
+// resolves into an upward step — "vital signs" (neonatal care) rising on evidence.
+// Self-contained SVG, no image request, scales crisply, inherits drop-shadow from CSS.
+const { size = 40 } = Astro.props;
+---
+<svg class="mark" width={size} height={size} viewBox="0 0 48 48" role="img"
+     aria-label="EBNEO" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ebneo-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b7285"/>
+      <stop offset="1" stop-color="#39b3c4"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#ebneo-g)"/>
+  <!-- ECG trace: flat → dip → tall spike → upward step, then flat -->
+  <path d="M8 27 H15 L18 27 L21 18 L25 34 L28 22 L31 22 L33 15 L36 15 H40"
+        fill="none" stroke="#ffffff" stroke-width="2.6"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

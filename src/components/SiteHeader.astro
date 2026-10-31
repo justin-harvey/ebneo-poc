@@ -1,0 +1,34 @@
+---
+import Brand from './Brand.astro';
+import Icon from './Icon.astro';
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/', label: 'About', icon: 'info' },
+  { href: '/reviews/', label: 'Reviews', icon: 'file' },
+  { href: '/vote/', label: 'Vote', icon: 'award' },
+  { href: '/authors/', label: 'Authors', icon: 'edit' },
+  { href: '/contact/', label: 'Contact', icon: 'mail' },
+];
+const isCurrent = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+<header class="site">
+  <div class="wrap">
+    <div class="bar">
+      <a class="brand" href="/" aria-label="EBNEO home">
+        <Brand size={40} />
+        <span class="name">EBNEO<small>Evidence-Based Neonatology</small></span>
+      </a>
+      <span class="spacer"></span>
+      <a class="support" href="https://www.paypal.com/donate/" rel="noopener">
+        <Icon name="heart" />Support Our Work</a>
+    </div>
+    <nav class="nav" aria-label="Primary">
+      {nav.map((n) => (
+        <a class="navlink" href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined}>
+          <Icon name={n.icon} />{n.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>

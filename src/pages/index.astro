@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PersonCard from '../components/PersonCard.astro';
+import board from '../data/board.json';
+import founders from '../data/founders.json';
+import { getCollection } from 'astro:content';
+
+const commentaries = (await getCollection('commentaries')).filter(
+  (c) => c.data.status !== 'draft'
+);
+const total = commentaries.length;
+---
+<Base>
+  <section class="panel">
+    <div class="hero">
+      <!-- Brand "vital signs" motif, echoing the logo ECG trace -->
+      <svg class="pulse" viewBox="0 0 240 60" fill="none" aria-hidden="true">
+        <path d="M0 40 H60 L72 40 L84 14 L100 52 L112 26 L124 26 L132 8 L144 40 H240"
+          stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge">International Society · Founded 2015</span>
+      <h1>Neonatal care, firmly based on the best available evidence.</h1>
+      <p class="lede">The International Society for Evidence-Based Neonatology (EBNEO) shortens the
+        path from research to the bedside — improving survival, reducing morbidity, and promoting
+        lifelong health for newborn infants. EBNEO is a registered non-profit in Sweden.</p>
+      <div class="facts">
+        <div class="fact"><Icon name="award2" /><b>2015</b><span>Society founded</span></div>
+        <div class="fact"><Icon name="users" /><b>20+</b><span>Board &amp; editors worldwide</span></div>
+        <div class="fact"><Icon name="activity" /><b>{total}+</b><span>Commentaries on this site</span></div>
+        <div class="fact"><Icon name="globe" /><b>10+</b><span>Countries represented</span></div>
+      </div>
+    </div>
+
+    <h2 class="section"><Icon name="users" />Executive Board</h2>
+    <p class="section-sub">Neonatologists and researchers guiding the society's evidence mission.</p>
+    <div class="grid board">
+      {board.members.map((p) => <PersonCard {...p} />)}
+    </div>
+
+    <h2 class="section"><Icon name="award" />Founders &amp; Past Board Chairs</h2>
+    <p class="section-sub">The clinicians who established EBNEO.</p>
+    <div class="grid board">
+      {founders.members.map((p) => <PersonCard {...p} />)}
+    </div>
+  </section>
+</Base>

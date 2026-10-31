@@ -1,0 +1,82 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import ReviewCard from '../../components/ReviewCard.astro';
+import { getCollection } from 'astro:content';
+
+const all = (await getCollection('commentaries')).filter((c) => c.data.status !== 'draft');
+const items = all
+  .map((c) => ({
+    title: c.data.title,
+    slug: c.slug,
+    investigation: (c.data.investigation || '').trim(),
+    year: c.data.publish_date ? new Date(c.data.publish_date).getUTCFullYear() : null,
+    date: c.data.publish_date ? +new Date(c.data.publish_date) : 0,
+  }))
+  .sort((a, b) => b.date - a.date);
+
+const investigations = [...new Set(items.map((i) => i.investigation).filter(Boolean))].sort();
+const years = [...new Set(items.map((i) => i.year).filter(Boolean))].sort((a, b) => b! - a!);
+---
+<Base title="Reviews & Commentaries"
+      description="Searchable archive of EBNEO's structured critical appraisals of recent, high-impact neonatal trials.">
+  <section class="panel">
+    <h2 class="section" style="margin-top:8px"><Icon name="file" />Reviews &amp; Commentaries</h2>
+    <p class="section-sub">Structured critical appraisals of recent, high-impact neonatal trials.
+      Search and filter {items.length} commentaries.</p>
+
+    <div class="filters">
+      <div class="f grow">
+        <label for="q">Search</label>
+        <input id="q" type="search" placeholder="Trial name, topic, intervention…" autocomplete="off" />
+      </div>
+      <div class="f">
+        <label for="inv">Type of investigation</label>
+        <select id="inv">
+          <option value="">All types</option>
+          {investigations.map((v) => <option value={v}>{v}</option>)}
+        </select>
+      </div>
+      <div class="f">
+        <label for="yr">Year</label>
+        <select id="yr">
+          <option value="">All years</option>
+          {years.map((y) => <option value={y}>{y}</option>)}
+        </select>
+      </div>
+    </div>
+
+    <p class="count" id="count"></p>
+    <div class="grid reviews" id="list">
+      {items.map((i) => <ReviewCard {...i} />)}
+    </div>
+    <p class="empty" id="empty">No commentaries match those filters. Try broadening your search.</p>
+  </section>
+
+  <script is:inline>
+    const q = document.getElementById('q');
+    const inv = document.getElementById('inv');
+    const yr = document.getElementById('yr');
+    const cards = [...document.querySelectorAll('#list .card')];
+    const count = document.getElementById('count');
+    const empty = document.getElementById('empty');
+
+    function apply() {
+      const term = q.value.trim().toLowerCase();
+      const fi = inv.value, fy = yr.value;
+      let shown = 0;
+      for (const c of cards) {
+        const ok =
+          (!term || c.dataset.title.includes(term)) &&
+          (!fi || c.dataset.investigation === fi) &&
+          (!fy || c.dataset.year === fy);
+        c.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      }
+      count.textContent = `Showing ${shown} of ${cards.length} commentaries`;
+      empty.style.display = shown ? 'none' : 'block';
+    }
+    [q, inv, yr].forEach((el) => el.addEventListener('input', apply));
+    apply();
+  </script>
+</Base>

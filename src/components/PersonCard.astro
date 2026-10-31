@@ -1,0 +1,14 @@
+---
+const { name, role, aff, img } = Astro.props;
+const initials = name.split(/\s+/).slice(0, 2).map((w: string) => w[0]).join('').toUpperCase();
+---
+<article class="person">
+  <div class="av">
+    {img
+      ? <img src={img} alt={`Portrait of ${name}`} loading="lazy" width="96" height="96" />
+      : <span>{initials}</span>}
+  </div>
+  <h3>{name}</h3>
+  <p class="role">{role}</p>
+  <p class="aff">{aff}</p>
+</article>

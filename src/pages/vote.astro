@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="Vote" description="The EBNEO community selects the neonatal research that matters most.">
+  <section class="panel">
+    <h2 class="section" style="margin-top:8px"><Icon name="award" />Cast Your Vote</h2>
+    <p class="section-sub">The EBNEO community selects the neonatal research that matters most.</p>
+    <div class="split">
+      <div class="box">
+        <h3>Article of the Month</h3>
+        <p>Each month the community reviews standout neonatal publications and votes for the
+          study with the greatest potential to change practice.</p>
+        <p style="color:var(--ink-soft);font-size:.9rem">In the static rebuild this ballot is
+          authored in the CMS (<code>polls</code> collection) and tallied by a Netlify Function —
+          see FEASIBILITY.md §4a / milestone M4b.</p>
+        <a class="btn" href="https://ebneo.org/vote/" rel="noopener"><Icon name="check" /> Vote now</a>
+      </div>
+      <div class="box">
+        <h3>Article of the Year</h3>
+        <p>Monthly winners advance to the annual ballot, where members choose the single most
+          impactful neonatal study of the year.</p>
+        <a class="btn" href="https://ebneo.org/impact" rel="noopener"><Icon name="award2" /> See Article of the Year</a>
+      </div>
+    </div>
+  </section>
+</Base>

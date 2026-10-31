@@ -1,0 +1,21 @@
+{
+  "members": [
+  { "name": "Ravi Patel", "role": "Board Chair", "aff": "Emory University, USA", "img": "/img/ravi-patel.jpg" },
+  { "name": "Karin Bäck", "role": "Treasurer", "aff": "Stockholm Southern Hospital, Sweden", "img": "/img/karin-b-ck.jpg" },
+  { "name": "Nicolas Bamat", "role": "Operations Lead", "aff": "University of Pennsylvania, USA", "img": "/img/nicolas-bamat.jpg" },
+  { "name": "Meg Kirkley", "role": "Secretary", "aff": "University of Colorado, USA", "img": "/img/meg-kirkley.jpg" },
+  { "name": "Clyde Wright", "role": "Reviews Co-Lead", "aff": "University of Colorado, USA", "img": "/img/clyde-wright.jpg" },
+  { "name": "Amy Keir", "role": "Reviews Co-Lead", "aff": "University of Adelaide, Australia", "img": "/img/amy-keir.jpg" },
+  { "name": "Brian King", "role": "Social Media Lead", "aff": "Children's Hospital of Pittsburgh, USA", "img": "/img/brian-king.jpg" },
+  { "name": "Omar Elkhateeb", "role": "Board Member", "aff": "King Fahad Medical City, Saudi Arabia", "img": "/img/omar-elkhateeb.png" },
+  { "name": "Souvik Mitra", "role": "Board Member", "aff": "Dalhousie University, Canada", "img": "/img/souvik-mitra.jpg" },
+  { "name": "Alexandra Scrivens", "role": "Board Member", "aff": "Oxford University, England", "img": "/img/alexandra-scrivens.png" },
+  { "name": "Abdul Razak", "role": "Board Member", "aff": "King Abdullah bin Abdulaziz University Hospital, Saudi Arabia", "img": "/img/abdul-razak.jpg" },
+  { "name": "Samia Aleem", "role": "Board Member", "aff": "Duke University, USA", "img": "/img/samia-aleem.jpg" },
+  { "name": "Atul Malhotra", "role": "Board Member", "aff": "Monash University, Australia", "img": "/img/atul-malhotra.jpg" },
+  { "name": "Dustin Flannery", "role": "Board Member", "aff": "University of Pennsylvania, USA", "img": "/img/dustin-flannery.jpg" },
+  { "name": "Fumihiko Namba", "role": "Board Member", "aff": "Saitama Medical University, Japan", "img": "/img/fumihiko-namba.jpg" },
+  { "name": "Rasheda Vereen", "role": "Board Member", "aff": "Brooke Army Medical Center, USA", "img": "/img/rasheda-vereen.jpg" },
+  { "name": "Stefan Johansson", "role": "Board Member", "aff": "Karolinska Institutet, Sweden", "img": "/img/stefan-johansson.png" }
+  ]
+}

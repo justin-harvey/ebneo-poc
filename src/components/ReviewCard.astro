@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+const { title, slug, investigation, year } = Astro.props;
+---
+<article class="card"
+  data-title={title.toLowerCase()}
+  data-investigation={investigation || ''}
+  data-year={year || ''}>
+  <span class="kicker"><Icon name="activity" />EBNEO Commentary</span>
+  <div class="meta">
+    {year && <span>{year}</span>}
+    {investigation && <span class="tag">{investigation}</span>}
+  </div>
+  <h3><a href={`/${slug}/`}>{title}</a></h3>
+  <a class="more" href={`/${slug}/`}>Read commentary <Icon name="arrow" /></a>
+</article>

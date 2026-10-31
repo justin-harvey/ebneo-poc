@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="Contact" description="Questions, partnerships, or press — contact EBNEO.">
+  <section class="panel">
+    <h2 class="section" style="margin-top:8px"><Icon name="mail" />Contact</h2>
+    <p class="section-sub">Questions, partnerships, or press — we'd love to hear from you.</p>
+    <div class="split">
+      <!-- Netlify Forms: data-netlify wires this to the dashboard with zero backend (M5). -->
+      <form class="box" name="contact" method="POST" data-netlify="true"
+            netlify-honeypot="bot-field" aria-label="Contact form">
+        <input type="hidden" name="form-name" value="contact" />
+        <p hidden><label>Don't fill this out: <input name="bot-field" /></label></p>
+        <label for="c-name">Name</label>
+        <input id="c-name" name="name" type="text" autocomplete="name" required />
+        <label for="c-email">Email</label>
+        <input id="c-email" name="email" type="email" autocomplete="email" required />
+        <label for="c-msg">Message</label>
+        <textarea id="c-msg" name="message" rows="4" required></textarea>
+        <button class="btn" type="submit">Send message</button>
+      </form>
+      <div class="box">
+        <h3>Stay connected</h3>
+        <p>EBNEO is a registered non-profit organisation in Sweden.<br />
+          Org. number: <strong>802493-2538</strong></p>
+        <p><a href="https://twitter.com/ebneo" rel="noopener"><Icon name="twitter" /> @ebneo on X/Twitter</a></p>
+        <p>Subscribe to the newsletter for new commentaries and voting announcements.</p>
+      </div>
+    </div>
+  </section>
+</Base>
