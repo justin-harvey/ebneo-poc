@@ -1,0 +1,7 @@
+# EBNEO — Evidence-Based Neonatology
+User-agent: *
+Allow: /
+# The CMS app is not content.
+Disallow: /admin/
+
+Sitemap: https://ebneo.org/sitemap.xml

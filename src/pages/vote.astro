@@ -24,7 +24,7 @@ function freeze(p: (typeof polls)[number]) {
 ---
 <Base title="Vote" description="The EBNEO community selects the neonatal research that matters most.">
   <section class="panel">
-    <h2 class="section" style="margin-top:8px"><Icon name="award" />Cast Your Vote</h2>
+    <h1 class="section" style="margin-top:8px"><Icon name="award" />Cast Your Vote</h1>
     <p class="section-sub">The EBNEO community selects the neonatal research that matters most.</p>
 
     <div class="split">
@@ -83,7 +83,7 @@ function freeze(p: (typeof polls)[number]) {
 
     {archive.length > 0 && (
       <div class="archive">
-        <h3 class="section" style="margin-top:8px"><Icon name="file" />Past polls</h3>
+        <h2 class="section" style="margin-top:8px"><Icon name="file" />Past polls</h2>
         <p class="section-sub">These polls are no longer accepting votes. Final tallies shown.</p>
         {archive.map((p) => {
           const frozen = freeze(p);

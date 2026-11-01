@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+// Astro emits this as dist/404.html; Netlify serves it for any unmatched path.
+---
+<Base title="Page not found" description="The page you were looking for could not be found.">
+  <section class="panel">
+    <h1 class="section" style="margin-top:8px"><Icon name="info" />Page not found</h1>
+    <p class="section-sub">We couldn't find that page. It may have moved since the site was rebuilt.</p>
+    <div class="box">
+      <p>Try one of these instead:</p>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/reviews/">Reviews &amp; Commentaries</a> — search the full archive</li>
+        <li><a href="/vote/">Vote</a> — the monthly ballot</li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+      <p style="color:var(--ink-soft);font-size:.9rem">Followed a link from an older EBNEO address?
+        Most legacy URLs redirect automatically — if one doesn't, please
+        <a href="/contact/">let us know</a>.</p>
+    </div>
+  </section>
+</Base>

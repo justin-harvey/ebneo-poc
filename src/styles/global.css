@@ -60,7 +60,7 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
   stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.125em}
 .navlink .icon{margin-right:.4em;opacity:.85}
 .support .icon{margin-right:.35em}
-h2.section .icon{color:var(--teal);margin-right:.4em;width:.9em;height:.9em}
+h1.section .icon,h2.section .icon{color:var(--teal);margin-right:.4em;width:.9em;height:.9em}
 .card .kicker .icon{width:.95em;height:.95em;margin-right:.3em;vertical-align:-.15em}
 .card a.more .icon,.btn .icon{width:.95em;height:.95em}
 .fact .icon{color:var(--teal);width:1.15rem;height:1.15rem;margin-bottom:4px}
@@ -92,7 +92,7 @@ h2.section .icon{color:var(--teal);margin-right:.4em;width:.9em;height:.9em}
 .fact b{display:block;font-size:1.5rem;color:var(--teal-dark)}
 .fact span{color:var(--ink-soft);font-size:.9rem}
 
-h2.section{font-size:1.5rem;margin:52px 0 6px;display:flex;align-items:center}
+h1.section,h2.section{font-size:1.5rem;margin:52px 0 6px;display:flex;align-items:center}
 .section-sub{color:var(--ink-soft);margin:0 0 22px}
 
 /* ---------- Grids / cards ---------- */

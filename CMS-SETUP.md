@@ -54,6 +54,49 @@ New posts get a clean title-based URL. The 83 migrated commentaries keep their o
 
 ---
 
+## Running the monthly poll (Vote)
+
+The `/vote` page shows the **newest poll with `status: open`** as the live ballot and lists every
+other poll in the "Past polls" archive. Opening a poll is pure content — no code.
+
+**Open a new monthly poll**
+1. `/admin/` → **Polls (Vote) → New Poll**.
+2. **Month** = the ballot month, e.g. `2026-11` (this is the ballot's key and sort order).
+3. **Question** — keep the default or edit it.
+4. **Candidate studies** — add 2–3 studies (title + optional authors, journal, date, link).
+   ⚠️ **Do not reorder the studies after voting starts** — a study's position is its vote id,
+   so reordering would reassign existing votes.
+5. **Status = open.** Save and publish. It becomes the live ballot; any previously open poll
+   should be closed (next step) so only one is open at a time.
+
+**Close a poll**
+- Edit the poll, set **Status = closed**, publish. It drops into "Past polls" and stops accepting
+  votes. Results keep loading live from the tally store.
+
+**Freeze final results (optional)** — if you ever want a closed poll's numbers baked into the page
+(e.g. before retiring the vote backend), add a `results` block to the file's front-matter mapping
+each study's index to its vote count, and the archive renders those bars statically:
+```yaml
+results:
+  "0": 86   # first study
+  "1": 54   # second study
+```
+
+**How votes are stored:** a Netlify Function (`netlify/functions/vote.mjs`) tallies votes in
+**Netlify Blobs**, keyed by month. One vote per browser (a cookie, matching the old site — not
+fraud-proof). See `RUNBOOK.md` for resetting or exporting tallies.
+
+---
+
+## Editing the board & founders (home page)
+
+The home-page rosters are a **Society** collection (two JSON files), not free-form pages:
+- `/admin/` → **Society → Executive Board** or **Founders & Past Chairs**.
+- Add/remove/reorder members; each has Name, Role, Affiliation, and an optional Photo.
+- Photos upload to `public/img/uploads/`. Save & publish → the home page rebuilds.
+
+---
+
 ## Local testing note
 
 `git-gateway` only works against the deployed Netlify site (it needs Identity). To preview the
