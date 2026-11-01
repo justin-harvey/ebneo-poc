@@ -127,5 +127,57 @@ collections:
               - { name: aff, label: Affiliation, widget: string }
               - { name: img, label: Photo, widget: image, required: false }
 
-# --- Planned for later milestones (kept here as a roadmap, not yet active) ---
-# M4b: `polls` collection for the monthly vote (question + 2-3 options + status).
+  # Monthly "Article of the Month" ballot (M4b). Authoring a new month here is the only
+  # step needed to open a poll — no code change. Votes are tallied by a Netlify Function
+  # (netlify/functions/vote.mjs) in Netlify Blobs, keyed by `month`. Closing a poll =
+  # flip `status` to "closed"; optionally paste the final tallies to freeze them.
+  - name: polls
+    label: Polls (Vote)
+    label_singular: Poll
+    description: >
+      The monthly Article of the Month ballot. Set status to "open" to accept votes;
+      flip to "closed" to stop. The live site shows the newest open poll and archives the rest.
+    folder: src/content/polls
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{month}}"
+    identifier_field: month
+    summary: "{{month}}  ·  {{status}}"
+    sortable_fields: [month, status]
+    fields:
+      - name: month
+        label: Month
+        widget: datetime
+        date_format: "YYYY-MM"
+        time_format: false
+        picker_utc: true
+        hint: "Drives the ballot key and ordering, e.g. 2026-11."
+      - name: question
+        label: Question
+        widget: string
+        default: "Which study is most likely to impact neonatal care?"
+      - name: status
+        label: Status
+        widget: select
+        default: open
+        options: [open, closed]
+      - name: options
+        label: Candidate studies
+        label_singular: Study
+        widget: list
+        min: 2
+        max: 4
+        summary: "{{fields.title}}"
+        hint: "2–3 studies on the ballot. Do not reorder after votes are cast — order is the vote id."
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: authors, label: Authors, widget: string, required: false }
+          - { name: journal, label: Journal, widget: string, required: false }
+          - { name: date, label: Pub date, widget: string, required: false }
+          - { name: url, label: Link, widget: string, required: false }
+      - name: body
+        label: Intro (optional)
+        widget: markdown
+        required: false
+        hint: "Optional note shown above the ballot."

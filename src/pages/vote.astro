@@ -1,21 +1,78 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+
+// Newest-first. The open ballot is the newest poll flagged `open`; everything else archives.
+const polls = (await getCollection('polls')).sort((a, b) =>
+  b.data.month.localeCompare(a.data.month),
+);
+const openPoll = polls.find((p) => p.data.status === 'open') ?? null;
+const archive = polls.filter((p) => p !== openPoll);
+
+// Shape a closed poll's frozen tallies (frontmatter `results`) into static bars.
+function freeze(p: (typeof polls)[number]) {
+  const r = p.data.results;
+  if (!r) return null;
+  const counts = p.data.options.map((_, i) => r[String(i)] ?? 0);
+  const total = counts.reduce((a, b) => a + b, 0);
+  return {
+    total,
+    rows: counts.map((n) => ({ n, pct: total ? Math.round((n / total) * 100) : 0 })),
+  };
+}
 ---
 <Base title="Vote" description="The EBNEO community selects the neonatal research that matters most.">
   <section class="panel">
     <h2 class="section" style="margin-top:8px"><Icon name="award" />Cast Your Vote</h2>
     <p class="section-sub">The EBNEO community selects the neonatal research that matters most.</p>
+
     <div class="split">
       <div class="box">
         <h3>Article of the Month</h3>
-        <p>Each month the community reviews standout neonatal publications and votes for the
-          study with the greatest potential to change practice.</p>
-        <p style="color:var(--ink-soft);font-size:.9rem">In the static rebuild this ballot is
-          authored in the CMS (<code>polls</code> collection) and tallied by a Netlify Function —
-          see FEASIBILITY.md §4a / milestone M4b.</p>
-        <a class="btn" href="https://ebneo.org/vote/" rel="noopener"><Icon name="check" /> Vote now</a>
+        {openPoll ? (
+          <>
+            <p class="poll-q">{openPoll.data.question}</p>
+            <form id="ballot" class="ballot" data-month={openPoll.data.month}>
+              <fieldset>
+                <legend class="sr-legend">{openPoll.data.question}</legend>
+                {openPoll.data.options.map((o, i) => (
+                  <label class="opt" data-i={i}>
+                    <input type="radio" name="opt" value={i} />
+                    <span class="opt-body">
+                      <span class="opt-title">{o.title}</span>
+                      {(o.authors || o.journal || o.date) && (
+                        <span class="opt-meta">
+                          {[o.authors, o.journal, o.date].filter(Boolean).join(' · ')}
+                        </span>
+                      )}
+                      {o.url && (
+                        <a class="opt-link" href={o.url} target="_blank" rel="noopener">
+                          Read the study <Icon name="arrow" />
+                        </a>
+                      )}
+                    </span>
+                    <span class="bar" aria-hidden="true">
+                      <span class="bar-fill"></span><span class="bar-pct"></span>
+                    </span>
+                  </label>
+                ))}
+              </fieldset>
+              <button class="btn" type="submit"><Icon name="check" /> Cast vote</button>
+              <p class="vote-total" id="voteTotal" aria-live="polite"></p>
+              <p class="vote-msg" id="voteMsg" aria-live="polite"></p>
+            </form>
+          </>
+        ) : (
+          <>
+            <p>Each month the community reviews standout neonatal publications and votes for the
+              study with the greatest potential to change practice.</p>
+            <p style="color:var(--ink-soft);font-size:.9rem">No poll is open right now — the next
+              Article of the Month ballot opens soon. Past results are below.</p>
+          </>
+        )}
       </div>
+
       <div class="box">
         <h3>Article of the Year</h3>
         <p>Monthly winners advance to the annual ballot, where members choose the single most
@@ -23,5 +80,160 @@ import Icon from '../components/Icon.astro';
         <a class="btn" href="https://ebneo.org/impact" rel="noopener"><Icon name="award2" /> See Article of the Year</a>
       </div>
     </div>
+
+    {archive.length > 0 && (
+      <div class="archive">
+        <h3 class="section" style="margin-top:8px"><Icon name="file" />Past polls</h3>
+        <p class="section-sub">These polls are no longer accepting votes. Final tallies shown.</p>
+        {archive.map((p) => {
+          const frozen = freeze(p);
+          return (
+            <article class="box past" data-month={p.data.month} data-frozen={frozen ? '1' : '0'}>
+              <div class="past-head">
+                <span class="tag">{p.data.month}</span>
+                <span class="closed">Closed</span>
+              </div>
+              <p class="poll-q">{p.data.question}</p>
+              <ul class="results">
+                {p.data.options.map((o, i) => (
+                  <li class="opt done" data-i={i}>
+                    <span class="opt-body">
+                      <span class="opt-title">
+                        {o.url ? <a href={o.url} target="_blank" rel="noopener">{o.title}</a> : o.title}
+                      </span>
+                      {(o.authors || o.journal || o.date) && (
+                        <span class="opt-meta">
+                          {[o.authors, o.journal, o.date].filter(Boolean).join(' · ')}
+                        </span>
+                      )}
+                    </span>
+                    <span class="bar" aria-hidden="true">
+                      <span
+                        class="bar-fill"
+                        style={frozen ? `width:${frozen.rows[i].pct}%` : ''}
+                      ></span>
+                      <span class="bar-pct">{frozen ? `${frozen.rows[i].pct}% (${frozen.rows[i].n})` : ''}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p class="vote-total">{frozen ? `${frozen.total} ${frozen.total === 1 ? 'vote' : 'votes'}` : ''}</p>
+            </article>
+          );
+        })}
+      </div>
+    )}
   </section>
+
+  <script is:inline>
+    // --- Open ballot: vote via /api/vote, then reveal live result bars. ---
+    const form = document.getElementById('ballot');
+
+    function paint(container, tallies, totalEl) {
+      const opts = [...container.querySelectorAll('.opt')];
+      let total = 0;
+      for (const o of opts) total += tallies[o.dataset.i] || 0;
+      container.classList.add('showing-results');
+      for (const o of opts) {
+        const n = tallies[o.dataset.i] || 0;
+        const pct = total ? Math.round((n / total) * 100) : 0;
+        o.querySelector('.bar-fill').style.width = pct + '%';
+        o.querySelector('.bar-pct').textContent = pct + '% (' + n + ')';
+      }
+      if (totalEl) totalEl.textContent = total + (total === 1 ? ' vote' : ' votes');
+    }
+
+    async function getResults(month) {
+      const r = await fetch('/api/results?month=' + encodeURIComponent(month));
+      if (!r.ok) throw new Error('results');
+      return (await r.json()).tallies || {};
+    }
+
+    if (form) {
+      const month = form.dataset.month;
+      const key = 'ebneo_voted_' + month;
+      const msg = document.getElementById('voteMsg');
+      const totalEl = document.getElementById('voteTotal');
+      const btn = form.querySelector('button[type=submit]');
+      const lock = () => form.querySelectorAll('input,button').forEach((el) => (el.disabled = true));
+
+      if (localStorage.getItem(key)) {
+        lock();
+        msg.textContent = 'You have already voted in this poll. Here are the live results.';
+        getResults(month).then((t) => paint(form, t, totalEl)).catch(() => {});
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const sel = form.querySelector('input[name=opt]:checked');
+        if (!sel) { msg.textContent = 'Please choose a study first.'; return; }
+        btn.disabled = true;
+        try {
+          const r = await fetch('/api/vote', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ month, option: Number(sel.value) }),
+          });
+          const data = await r.json();
+          if (!r.ok) throw new Error(data.error || 'vote');
+          localStorage.setItem(key, '1');
+          lock();
+          msg.textContent = data.already
+            ? 'You have already voted in this poll. Here are the live results.'
+            : 'Thanks for voting! Here are the live results.';
+          paint(form, data.tallies || {}, totalEl);
+        } catch {
+          btn.disabled = false;
+          msg.textContent = 'Sorry, your vote could not be recorded. Please try again.';
+        }
+      });
+    }
+
+    // --- Archive: fill bars for any closed poll whose tallies were not frozen in the CMS. ---
+    for (const el of document.querySelectorAll('.past[data-frozen="0"]')) {
+      getResults(el.dataset.month)
+        .then((t) => paint(el, t, el.querySelector('.vote-total')))
+        .catch(() => {});
+    }
+  </script>
+
+  <style>
+    .poll-q { font-weight: 700; margin: 0 0 16px; }
+    .sr-legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .ballot fieldset { border: 0; padding: 0; margin: 0; }
+    .opt {
+      position: relative; display: block; border: 1px solid var(--line); border-radius: 10px;
+      padding: 12px 14px; margin: 0 0 10px; cursor: pointer; background: var(--wash);
+      transition: border-color .15s, background .15s;
+    }
+    .ballot .opt { padding-left: 40px; }
+    .ballot .opt input { position: absolute; left: 14px; top: 15px; }
+    .opt:hover { border-color: var(--ring); }
+    .opt-body { display: block; }
+    .opt-title { display: block; font-weight: 600; }
+    .opt-meta { display: block; font-size: .82rem; color: var(--ink-soft); margin-top: 2px; }
+    .opt-link { display: inline-flex; align-items: center; gap: .3em; font-size: .82rem;
+      font-weight: 700; color: var(--teal-dark); text-decoration: none; margin-top: 4px; }
+    .opt-link .icon { width: .9em; height: .9em; }
+    /* Result bar: hidden until results are in (open poll) / frozen (archive). */
+    .bar { display: none; position: relative; height: 10px; margin-top: 10px;
+      background: var(--sky); border-radius: 999px; overflow: hidden; }
+    .bar-fill { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--teal);
+      border-radius: 999px; transition: width .5s ease; }
+    .bar-pct { position: absolute; right: 8px; top: -20px; font-size: .78rem;
+      font-weight: 700; color: var(--teal-dark); }
+    .showing-results .bar, .results .bar { display: block; }
+    .showing-results .opt { cursor: default; }
+    .vote-total { font-size: .85rem; color: var(--ink-soft); font-weight: 700; margin: 6px 0 0; }
+    .vote-msg { font-size: .9rem; color: var(--teal-dark); margin: 8px 0 0; min-height: 1.2em; }
+    .archive { margin-top: 44px; }
+    .archive .past { margin-bottom: 18px; }
+    .past-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .past .closed { font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--ink-soft); }
+    .results { list-style: none; padding: 0; margin: 0; }
+    .results .opt { padding: 12px 14px; cursor: default; }
+    .results .opt-title a { color: var(--ink); text-decoration: none; }
+    .results .opt-title a:hover { color: var(--teal-dark); }
+  </style>
 </Base>

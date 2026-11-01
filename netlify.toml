@@ -5,6 +5,12 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# M4b voting backend. The Function files use `export const config = { path }`, so the
+# /api/vote and /api/results routes are defined in-code; this just pins the directory.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[headers]]
   for = "/*"
   [headers.values]
