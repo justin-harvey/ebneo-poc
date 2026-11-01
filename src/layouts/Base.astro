@@ -3,9 +3,10 @@ import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 const { title, description } = Astro.props;
-const fullTitle = title ? `${title} — EBNEO` : 'EBNEO — Evidence-Based Neonatology';
+const fullTitle = title ? `${title} · EBNEO` : 'EBNEO · Evidence-Based Neonatology';
 const desc = description ??
   'The International Society for Evidence-Based Neonatology (EBNEO): appraising the best available evidence to improve care for newborn infants.';
+const ogImage = new URL('/img/ebneo-logo.png', Astro.site).href;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +15,15 @@ const desc = description ??
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{fullTitle}</title>
   <meta name="description" content={desc} />
+  <link rel="icon" type="image/png" href="/favicon.png" sizes="any" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0070c0" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={desc} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content={ogImage} />
   <!-- Netlify Identity: powers CMS invites + login. On accepting an invite the user
        lands here with a token; this redirects them into /admin/ after login. -->
   <script is:inline src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>

@@ -1,9 +1,8 @@
 ---
-import Brand from './Brand.astro';
 import Icon from './Icon.astro';
 const path = Astro.url.pathname;
 const nav = [
-  { href: '/', label: 'About', icon: 'info' },
+  { href: '/about/', label: 'About', icon: 'info' },
   { href: '/reviews/', label: 'Reviews', icon: 'file' },
   { href: '/vote/', label: 'Vote', icon: 'award' },
   { href: '/authors/', label: 'Authors', icon: 'edit' },
@@ -15,9 +14,9 @@ const isCurrent = (href: string) =>
 <header class="site">
   <div class="wrap">
     <div class="bar">
-      <a class="brand" href="/" aria-label="EBNEO home">
-        <Brand size={40} />
-        <span class="name">EBNEO<small>Evidence-Based Neonatology</small></span>
+      <a class="brand" href="/" aria-label="EBNEO, Evidence-Based Neonatology, home">
+        <img class="logo" src="/img/ebneo-logo.png" width="800" height="384"
+             alt="EBNEO, Evidence-Based Neonatology" />
       </a>
       <span class="spacer"></span>
       <a class="support" href="https://www.paypal.com/donate/" rel="noopener">

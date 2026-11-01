@@ -23,9 +23,9 @@ body{
   /* Clinical texture: a faint precision dot-grid over the wash — signals data/rigour
      without visual noise. Pure CSS, no image request. */
   background-color:var(--wash);
-  background-image:radial-gradient(var(--line) 0.9px, transparent 0.9px);
-  background-size:22px 22px;
-  background-position:-11px -11px;
+  background-image:radial-gradient(rgba(11,114,133,.16) 1.2px, transparent 1.2px);
+  background-size:20px 20px;
+  background-position:-10px -10px;
   font:400 17px/1.6 "Segoe UI",Roboto,-apple-system,Helvetica,Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
@@ -46,6 +46,7 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
 .bar{display:flex;align-items:center;gap:16px;min-height:68px}
 .brand{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--ink);
   text-decoration:none;letter-spacing:.3px}
+.brand .logo{height:46px;width:auto;flex:none;display:block}
 .brand .mark{width:40px;height:40px;flex:none;filter:drop-shadow(0 4px 10px rgba(11,114,133,.35))}
 .brand .name{font-size:1.05rem}
 .brand small{display:block;font-weight:500;color:var(--ink-soft);font-size:11px;
@@ -165,14 +166,47 @@ form input,form textarea{width:100%;padding:.7rem .8rem;border:1px solid var(--l
   border-radius:10px;font:inherit;background:var(--wash)}
 form input:focus,form textarea:focus{background:#fff;border-color:var(--ring)}
 
-footer.site{background:var(--ink);color:#cfe0e8;padding:36px 0;margin-top:40px}
-footer.site a{color:#fff}
-footer .row{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:center}
-footer small{color:#93aebc}
+footer.site{background:var(--ink);color:#cfe0e8;padding:44px 0 28px;margin-top:40px}
+footer.site a{color:#cfe0e8;text-decoration:none}
+footer.site a:hover{color:#fff}
+footer .fcols{display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:36px}
+footer .fbrand .brand{color:#fff;align-items:center}
+footer .fmark{width:42px;height:42px;flex:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))}
+footer .fbrand .brand small{color:#93aebc}
+footer .fbrand p{color:#9fbccb;font-size:.9rem;line-height:1.55;margin:14px 0 0;max-width:34ch}
+footer .fnav,footer .fmeta{display:flex;flex-direction:column;gap:9px}
+footer h2{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#7fa6b6;margin:4px 0 6px}
+footer .fnav a{font-size:.92rem}
+footer .fmeta p{color:#9fbccb;font-size:.9rem;line-height:1.55;margin:0 0 4px}
+footer .flink{display:inline-flex;align-items:center;gap:.45em;font-size:.92rem;font-weight:600}
+footer .flink .icon{width:1em;height:1em;color:var(--teal-bright)}
+footer .frow{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;
+  align-items:center;margin-top:30px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1)}
+footer small{color:#7fa6b6;font-size:.82rem}
 
+/* ---------- Goals (home) ---------- */
+.goals{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.goal{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.goal .icon{width:1.5rem;height:1.5rem;color:var(--teal)}
+.goal p{margin:0;color:var(--ink-soft);font-size:.95rem;line-height:1.5}
+
+/* X / social link on person cards */
+.person .x{display:inline-flex;align-items:center;gap:.35em;margin-top:10px;
+  font-size:.8rem;font-weight:600;color:var(--teal-dark);text-decoration:none}
+.person .x:hover{color:var(--teal)}
+.person .x .icon{width:.95em;height:.95em}
+
+@media (max-width:860px){
+  footer .fcols{grid-template-columns:1fr 1fr}
+  footer .fbrand{grid-column:1 / -1}
+}
 @media (max-width:640px){
   .split{grid-template-columns:1fr}
   .hero{padding:26px}
+  .brand .logo{height:38px}
+  footer .fcols{grid-template-columns:1fr;gap:28px}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}

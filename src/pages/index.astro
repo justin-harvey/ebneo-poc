@@ -22,7 +22,7 @@ const total = commentaries.length;
       <span class="badge">International Society · Founded 2015</span>
       <h1>Neonatal care, firmly based on the best available evidence.</h1>
       <p class="lede">The International Society for Evidence-Based Neonatology (EBNEO) shortens the
-        path from research to the bedside — improving survival, reducing morbidity, and promoting
+        path from research to the bedside, improving survival, reducing morbidity, and promoting
         lifelong health for newborn infants. EBNEO is a registered non-profit in Sweden.</p>
       <div class="facts">
         <div class="fact"><Icon name="award2" /><b>2015</b><span>Society founded</span></div>
@@ -32,7 +32,16 @@ const total = commentaries.length;
       </div>
     </div>
 
-    <h2 class="section"><Icon name="users" />Executive Board</h2>
+    <h2 class="section"><Icon name="award2" />Our goals</h2>
+    <p class="section-sub">What the society works toward, every month.</p>
+    <div class="grid goals">
+      <div class="goal"><Icon name="globe" /><p>Provide an international forum to communicate and support evidence-based medicine for neonatal care in a global context.</p></div>
+      <div class="goal"><Icon name="search" /><p>Provide an interactive forum for the critical evaluation of the literature.</p></div>
+      <div class="goal"><Icon name="activity" /><p>Give neonatal care-givers the best available knowledge by widening the dissemination of evidence-based neonatology.</p></div>
+      <div class="goal"><Icon name="check" /><p>Facilitate research on diagnostic procedures and interventions for important clinical outcomes.</p></div>
+    </div>
+
+    <h2 id="board" class="section"><Icon name="users" />Executive Board</h2>
     <p class="section-sub">Neonatologists and researchers guiding the society's evidence mission.</p>
     <div class="grid board">
       {board.members.map((p) => <PersonCard {...p} />)}

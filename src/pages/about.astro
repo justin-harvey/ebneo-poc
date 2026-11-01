@@ -1,0 +1,81 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { getCollection } from 'astro:content';
+// Dedicated About page: the founding narrative + mission, goals, how EBNEO works, and the
+// society's non-profit details. Sources: markdown_output/home.md and author-instructions.md.
+const total = (await getCollection('commentaries')).filter((c) => c.data.status !== 'draft').length;
+---
+<Base title="About"
+      description="About the International Society for Evidence-Based Neonatology (EBNEO): our mission, goals, and how we turn the best neonatal research into practice.">
+  <section class="panel">
+    <div class="hero">
+      <svg class="pulse" viewBox="0 0 240 60" fill="none" aria-hidden="true">
+        <path d="M0 40 H60 L72 40 L84 14 L100 52 L112 26 L124 26 L132 8 L144 40 H240"
+          stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge">International Society · Founded 2015</span>
+      <h1>About EBNEO</h1>
+      <p class="lede">The International Society for Evidence-Based Neonatology shares one vision: that
+        all neonatal care should be firmly built on the best available evidence, with the shortest
+        possible path from research to the newborn's bedside.</p>
+    </div>
+
+    <h2 class="section"><Icon name="info" />Our mission</h2>
+    <p class="section-sub">Why EBNEO exists.</p>
+    <div class="box" style="margin-bottom:8px">
+      <p>EBNEO was founded in 2015 with a vision that neonatal care should be firmly based on the best
+        available evidence. That vision centres on a short passage from research-based knowledge to
+        implementation at the bedside, a process known as translation, thereby improving survival,
+        decreasing morbidity, and promoting long-lasting health for newborn infants.</p>
+      <p style="margin-bottom:0">The society brings together neonatologists and researchers across
+        more than ten countries to appraise the literature, discuss what it means for practice, and
+        make that knowledge easy for clinicians everywhere to find and act on.</p>
+    </div>
+
+    <h2 class="section"><Icon name="award2" />Our goals</h2>
+    <p class="section-sub">What the society works toward, every month.</p>
+    <div class="grid goals">
+      <div class="goal"><Icon name="globe" /><p>Provide an international forum to communicate and support evidence-based medicine for neonatal care in a global context.</p></div>
+      <div class="goal"><Icon name="search" /><p>Provide an interactive forum for the critical evaluation of the literature.</p></div>
+      <div class="goal"><Icon name="activity" /><p>Give neonatal care-givers the best available knowledge by widening the dissemination of evidence-based neonatology.</p></div>
+      <div class="goal"><Icon name="check" /><p>Facilitate research on diagnostic procedures and interventions for important clinical outcomes.</p></div>
+    </div>
+
+    <h2 class="section"><Icon name="file" />How EBNEO works</h2>
+    <p class="section-sub">From a new study to a bedside-ready summary.</p>
+    <div class="split">
+      <div class="box">
+        <h3>Monthly evidence commentaries</h3>
+        <p>In collaboration with and supported by <a href="https://onlinelibrary.wiley.com/journal/16512227" rel="noopener">Acta Paediatrica</a>,
+          EBNEO publishes monthly, concise, user-friendly, peer-reviewed summaries of the best
+          original articles on the clinical care of neonates.</p>
+        <p style="margin-bottom:0">Each summary pairs a structured abstract of the primary literature
+          with a brief commentary on the study's clinical implications. The commentary appears in Acta
+          Paediatrica, and the structured abstract is published here, where {total}+ now form a
+          searchable archive.</p>
+      </div>
+      <div class="box">
+        <h3>Where to go next</h3>
+        <p>Read the archive, take part in the monthly vote, or contribute a commentary of your own.</p>
+        <p style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0">
+          <a class="btn" href="/reviews/"><Icon name="file" />Browse reviews</a>
+          <a class="btn" href="/vote/"><Icon name="award" />Cast your vote</a>
+          <a class="btn" href="/authors/"><Icon name="edit" />Write for EBNEO</a>
+        </p>
+      </div>
+    </div>
+
+    <h2 class="section"><Icon name="users" />The society</h2>
+    <p class="section-sub">Governance and registration.</p>
+    <div class="box">
+      <p>EBNEO is a registered non-profit organisation in Sweden. Its organisation and fiscal number
+        is <strong>802493-2538</strong>. The society is led by an international Executive Board and was
+        established by its founding chairs in 2015.</p>
+      <p style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:0">
+        <a class="btn" href="/#board"><Icon name="users" />Meet the board</a>
+        <a class="btn" href="/contact/"><Icon name="mail" />Contact EBNEO</a>
+      </p>
+    </div>
+  </section>
+</Base>

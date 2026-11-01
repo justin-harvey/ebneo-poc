@@ -1,6 +1,37 @@
+---
+import Icon from './Icon.astro';
+const year = new Date().getFullYear();
+---
 <footer class="site">
-  <div class="wrap row">
-    <div><strong>EBNEO</strong> — International Society for Evidence-Based Neonatology</div>
-    <small>Static rebuild · content from ebneo.org · © EBNEO</small>
+  <div class="wrap">
+    <div class="fcols">
+      <div class="fbrand">
+        <a class="brand" href="/" aria-label="EBNEO, Evidence-Based Neonatology, home">
+          <img class="fmark" src="/img/ebneo-mark.png" width="196" height="196" alt="" aria-hidden="true" />
+          <span class="name">EBNEO<small>Evidence-Based Neonatology</small></span>
+        </a>
+        <p>The International Society for Evidence-Based Neonatology, shortening the path from
+          research to the newborn's bedside.</p>
+      </div>
+      <nav class="fnav" aria-label="Footer">
+        <h2>Explore</h2>
+        <a href="/about/">About</a>
+        <a href="/reviews/">Reviews</a>
+        <a href="/vote/">Vote</a>
+        <a href="/impact/">Article of the Year</a>
+        <a href="/authors/">For authors</a>
+        <a href="/contact/">Contact</a>
+      </nav>
+      <div class="fmeta">
+        <h2>The society</h2>
+        <p>Registered non-profit in Sweden.<br />Org. number 802493-2538.</p>
+        <a class="flink" href="https://x.com/ebneo" rel="noopener"><Icon name="twitter" />@ebneo on X</a>
+        <a class="flink" href="https://www.paypal.com/donate/" rel="noopener"><Icon name="heart" />Support our work</a>
+      </div>
+    </div>
+    <div class="frow">
+      <small>&copy; {year} EBNEO · International Society for Evidence-Based Neonatology</small>
+      <small>Neonatal care, firmly based on the best available evidence.</small>
+    </div>
   </div>
 </footer>
