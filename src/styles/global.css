@@ -97,6 +97,7 @@ h2.section{font-size:1.5rem;margin:52px 0 6px;display:flex;align-items:center}
 
 /* ---------- Grids / cards ---------- */
 .grid{display:grid;gap:16px}
+.grid[hidden]{display:none} /* [hidden] attr alone loses to display:grid */
 .board{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
 .person{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;
   box-shadow:var(--shadow);text-align:center}
@@ -122,6 +123,9 @@ h2.section{font-size:1.5rem;margin:52px 0 6px;display:flex;align-items:center}
 .card h3 a:hover{color:var(--teal-dark)}
 .card a.more{margin-top:auto;font-weight:700;text-decoration:none;color:var(--teal-dark);
   display:inline-flex;align-items:center;gap:.35em}
+/* Full-text search snippet (Pagefind results); <mark> flags matched terms. */
+.card .excerpt{font-size:.85rem;color:var(--ink-soft);line-height:1.5;margin:0}
+.card .excerpt mark{background:var(--sky);color:var(--teal-dark);padding:0 .15em;border-radius:3px}
 
 /* ---------- Filter bar (archive) ---------- */
 .filters{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin:0 0 24px;

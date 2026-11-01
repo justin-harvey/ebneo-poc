@@ -47,9 +47,12 @@ const years = [...new Set(items.map((i) => i.year).filter(Boolean))].sort((a, b)
     </div>
 
     <p class="count" id="count"></p>
+    <!-- Server-rendered archive: the default view and the no-JS fallback. -->
     <div class="grid reviews" id="list">
       {items.map((i) => <ReviewCard {...i} />)}
     </div>
+    <!-- Pagefind-powered results: full-text search over commentary bodies + facets. -->
+    <div class="grid reviews" id="results" hidden></div>
     <p class="empty" id="empty">No commentaries match those filters. Try broadening your search.</p>
   </section>
 
@@ -57,26 +60,96 @@ const years = [...new Set(items.map((i) => i.year).filter(Boolean))].sort((a, b)
     const q = document.getElementById('q');
     const inv = document.getElementById('inv');
     const yr = document.getElementById('yr');
-    const cards = [...document.querySelectorAll('#list .card')];
+    const list = document.getElementById('list');       // static grid
+    const results = document.getElementById('results');  // dynamic grid
     const count = document.getElementById('count');
     const empty = document.getElementById('empty');
+    const total = list.querySelectorAll('.card').length;
 
-    function apply() {
+    // Title-only fallback used until Pagefind loads (and if it fails to load).
+    const cards = [...list.querySelectorAll('.card')];
+    function fallbackFilter() {
       const term = q.value.trim().toLowerCase();
       const fi = inv.value, fy = yr.value;
       let shown = 0;
       for (const c of cards) {
-        const ok =
-          (!term || c.dataset.title.includes(term)) &&
-          (!fi || c.dataset.investigation === fi) &&
-          (!fy || c.dataset.year === fy);
+        const ok = (!term || c.dataset.title.includes(term)) &&
+                   (!fi || c.dataset.investigation === fi) &&
+                   (!fy || c.dataset.year === fy);
         c.style.display = ok ? '' : 'none';
         if (ok) shown++;
       }
-      count.textContent = `Showing ${shown} of ${cards.length} commentaries`;
+      count.textContent = `Showing ${shown} of ${total} commentaries`;
       empty.style.display = shown ? 'none' : 'block';
     }
-    [q, inv, yr].forEach((el) => el.addEventListener('input', apply));
-    apply();
+
+    const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const svg = (p) => `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${p}</svg>`;
+    const I_ACTIVITY = svg('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>');
+    const I_ARROW = svg('<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>');
+
+    function card(d) {
+      const m = d.meta || {};
+      const metaBits = [m.year && `<span>${esc(m.year)}</span>`,
+        m.investigation && `<span class="tag">${esc(m.investigation)}</span>`]
+        .filter(Boolean).join('');
+      // Pagefind pre-escapes excerpt text and wraps matches in <mark>, so it is safe HTML.
+      const excerpt = d.excerpt ? `<p class="excerpt">${d.excerpt}</p>` : '';
+      return `<article class="card">
+        <span class="kicker">${I_ACTIVITY}EBNEO Commentary</span>
+        <div class="meta">${metaBits}</div>
+        <h3><a href="${esc(d.url)}">${esc(m.title)}</a></h3>
+        ${excerpt}
+        <a class="more" href="${esc(d.url)}">Read commentary ${I_ARROW}</a>
+      </article>`;
+    }
+
+    let pagefind = null;
+
+    async function search() {
+      const term = q.value.trim();
+      const fi = inv.value, fy = yr.value;
+
+      // Nothing active -> show the static archive, skip Pagefind.
+      if (!term && !fi && !fy) {
+        results.hidden = true; results.innerHTML = '';
+        list.hidden = false;
+        cards.forEach((c) => (c.style.display = ''));
+        count.textContent = `${total} commentaries`;
+        empty.style.display = 'none';
+        return;
+      }
+
+      if (!pagefind) { fallbackFilter(); return; }
+
+      const filters = {};
+      if (fi) filters.investigation = fi;
+      if (fy) filters.year = fy;
+      const opts = { filters };
+      if (!term) opts.sort = { date: 'desc' }; // newest first when not ranking by relevance
+
+      const r = await pagefind.search(term || null, opts);
+      const data = await Promise.all(r.results.map((x) => x.data()));
+
+      list.hidden = true;
+      results.hidden = false;
+      results.innerHTML = data.map(card).join('');
+      count.textContent = `Showing ${data.length} of ${total} commentaries`;
+      empty.style.display = data.length ? 'none' : 'block';
+    }
+
+    let t;
+    const debounced = () => { clearTimeout(t); t = setTimeout(search, 150); };
+    q.addEventListener('input', debounced);
+    inv.addEventListener('input', search);
+    yr.addEventListener('input', search);
+
+    count.textContent = `${total} commentaries`;
+
+    // Load the Pagefind bundle produced at build time (postbuild step).
+    import('/pagefind/pagefind.js')
+      .then(async (pf) => { await pf.init(); pagefind = pf; if (q.value || inv.value || yr.value) search(); })
+      .catch(() => { /* dev server / index missing: keep title-only fallback */ });
   </script>
 </Base>

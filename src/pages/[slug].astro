@@ -11,14 +11,26 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const d = entry.data;
-const date = d.publish_date
-  ? new Date(d.publish_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
+const dateObj = d.publish_date ? new Date(d.publish_date) : null;
+const date = dateObj
+  ? dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })
   : null;
+const year = dateObj ? dateObj.getUTCFullYear() : null;
+// Pagefind meta read off the archive results (full-text search is built in M4a).
+const meta = [
+  d.investigation && `investigation:${d.investigation}`,
+  year && `year:${year}`,
+  date && `date:${date}`,
+].filter(Boolean).join(', ');
 ---
 <Base title={d.title.replace(/^EBNEO\s+Commentary:?\s*/i, '')}>
   <section class="panel">
     <p class="breadcrumb"><a href="/reviews/">← All reviews</a></p>
-    <article class="article">
+    <article class="article" data-pagefind-body
+      data-pagefind-filter={d.investigation ? `investigation:${d.investigation}` : undefined}
+      data-pagefind-sort={dateObj ? `date:${dateObj.toISOString().slice(0, 10)}` : undefined}
+      data-pagefind-meta={meta || undefined}>
+      {year && <span data-pagefind-filter={`year:${year}`} hidden></span>}
       <h1>{d.title}</h1>
       <p class="byline">
         {date && <span>{date}</span>}
