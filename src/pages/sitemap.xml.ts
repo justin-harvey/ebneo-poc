@@ -11,7 +11,9 @@ export async function GET(context: APIContext) {
     '/',
     '/reviews/',
     '/vote/',
+    '/impact/',
     '/authors/',
+    '/author-instructions/',
     '/contact/',
     '/2016/01/ebneo-2015-conference-video-series-gordon-guyatt/',
   ];

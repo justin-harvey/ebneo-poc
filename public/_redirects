@@ -52,8 +52,6 @@
 
 # --- Legacy pages -> new routes (301) ---
 /category/reviews/*	/reviews/	301
-/author-instructions/	/authors/	301
-/impact/	/	301
-/impact	/	301
+# /author-instructions/ and /impact/ are now real rebuilt pages (served directly, no redirect).
 /login/	/	301
 /login	/	301
