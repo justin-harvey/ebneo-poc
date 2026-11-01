@@ -6,6 +6,19 @@ why, and anything a future session needs to know.
 
 ---
 
+## 2026-11-01 — Add "Article of the Year" to the top nav
+
+**What:** `/impact/` (Article of the Year) was only linked in the footer, not the
+header menu, so it was effectively unreachable from the top of the site. Added it
+to `SiteHeader.astro`'s `nav` array between Vote and Authors (icon `award2`, to
+distinguish from Vote's `award`).
+
+**Why:** Justin flagged there was no way to navigate to Impact from the menu.
+
+**Files:** `src/components/SiteHeader.astro`.
+
+---
+
 ## 2026-11-01 — M15 archive re-migration: +113 commentaries (83 → 196)
 
 **What:** Migrated the 113 commentaries that the M15 coverage audit found had
