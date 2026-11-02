@@ -6,6 +6,21 @@ why, and anything a future session needs to know.
 
 ---
 
+## 2026-11-02 — CMS: first-run help card + photo-field reassurance hint
+
+**What:** Added editor onboarding guidance to `/admin/`. (1) A dismissible, fixed-position "Need a
+hand publishing?" help card in `public/admin/index.html` that walks the left-to-right Workflow board
+(Drafts → In review → Ready → Publish) and repeats the photo tip; it's a sibling of Decap's React root
+so re-renders can't break it, and it remembers collapsed state in localStorage. (2) A native `hint` on
+both `society` photo fields: "If the preview stays blank after uploading, don't worry: the photo still
+saves and appears on the live site." Also scrubbed em dashes from editor-facing admin copy (title, list
+summaries, hints) per the house no-em-dash style; two `#` dev comments left as-is.
+
+**Why:** First-time editors found the blank image preview confusing (the Decap + git-gateway preview
+quirk) and the workflow non-obvious. Pure `public/` assets, no build impact.
+
+---
+
 ## 2026-11-02 — Board/founders: LinkedIn alongside X on PersonCard
 
 **What:** Added an optional **LinkedIn** social link to the board + founders cards, next to the

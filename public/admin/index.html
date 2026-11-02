@@ -4,12 +4,61 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
-  <title>EBNEO — Content Admin</title>
+  <title>EBNEO · Content Admin</title>
 </head>
 <body>
   <!-- Decap CMS (maintained fork of Netlify CMS): Git-based, no server. Reads /admin/config.yml.
        Uses the git-gateway backend + Netlify Identity (invite-only, no GitHub account for editors).
        Sveltia was evaluated but dropped git-gateway support; Decap keeps that model. Version pinned. -->
   <script src="https://unpkg.com/decap-cms@3.17.3/dist/decap-cms.js"></script>
+
+  <!-- First-run help card. A fixed-position sibling of Decap's React root (#nc-root),
+       so Decap re-renders never touch it. Collapsible; remembers its state in localStorage. -->
+  <style>
+    #ebneo-help{position:fixed;right:16px;bottom:16px;z-index:9999;max-width:340px;
+      font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#1a2b33}
+    #ebneo-help .hd{display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;
+      background:#0070c0;color:#fff;border:none;padding:10px 14px;border-radius:10px;
+      cursor:pointer;font:600 14px/1.3 inherit;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+    #ebneo-help.open .hd{border-radius:10px 10px 0 0}
+    #ebneo-help .chev{margin-left:auto;transition:transform .15s}
+    #ebneo-help.open .chev{transform:rotate(90deg)}
+    #ebneo-help .bd{display:none;background:#fff;border:1px solid #d7e3ea;border-top:none;
+      border-radius:0 0 10px 10px;padding:14px;box-shadow:0 10px 24px rgba(0,0,0,.16)}
+    #ebneo-help.open .bd{display:block}
+    #ebneo-help p{margin:0 0 8px}
+    #ebneo-help ol{margin:0 0 10px;padding-left:20px}
+    #ebneo-help li{margin:5px 0}
+    #ebneo-help .tip{background:#eaf4fb;border-left:3px solid #0070c0;
+      padding:8px 10px;border-radius:4px;margin:2px 0 0}
+  </style>
+  <div id="ebneo-help">
+    <button class="hd" type="button" aria-expanded="false" aria-controls="ebneo-help-bd">
+      <span>Need a hand publishing?</span><span class="chev" aria-hidden="true">&rsaquo;</span>
+    </button>
+    <div class="bd" id="ebneo-help-bd">
+      <p><strong>How a change goes live.</strong> The Workflow board moves left to right:</p>
+      <ol>
+        <li><strong>Drafts</strong>: your work in progress. New entries start here.</li>
+        <li><strong>In review</strong>: move the card here when it's ready for a second look. A preview link builds automatically.</li>
+        <li><strong>Ready</strong>: move it here once it's approved.</li>
+        <li><strong>Publish</strong>: hit Publish and the live site rebuilds in a minute or two.</li>
+      </ol>
+      <p class="tip">Photos: if an uploaded image stays blank in this editor, don't worry, it still saves and appears on the live site.</p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var box = document.getElementById('ebneo-help');
+      var btn = box.querySelector('.hd');
+      var KEY = 'ebneo-help-collapsed';
+      if (localStorage.getItem(KEY) !== '1') { box.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+      btn.addEventListener('click', function () {
+        var open = box.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        localStorage.setItem(KEY, open ? '0' : '1');
+      });
+    })();
+  </script>
 </body>
 </html>
