@@ -7,8 +7,9 @@
   <title>EBNEO — Content Admin</title>
 </head>
 <body>
-  <!-- Sveltia CMS: Decap-compatible, Git-based, no server. Reads /admin/config.yml.
-       Pin a version before launch (e.g. @sveltia/cms@0.x) once a release is chosen. -->
-  <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+  <!-- Decap CMS (maintained fork of Netlify CMS): Git-based, no server. Reads /admin/config.yml.
+       Uses the git-gateway backend + Netlify Identity (invite-only, no GitHub account for editors).
+       Sveltia was evaluated but dropped git-gateway support; Decap keeps that model. Version pinned. -->
+  <script src="https://unpkg.com/decap-cms@3.17.3/dist/decap-cms.js"></script>
 </body>
 </html>

@@ -1,8 +1,10 @@
 # EBNEO CMS — setup & editor guide (M2)
 
-The site uses **Sveltia CMS** (a maintained, Decap/Netlify-CMS–compatible editor). It is
+The site uses **Decap CMS** (the maintained fork of Netlify CMS). It is
 Git-based: editors fill a form in the browser, and every save becomes a commit that triggers a
-Netlify build. No database, no server, no WordPress plugins.
+Netlify build. No database, no server, no WordPress plugins. (Sveltia CMS was evaluated first but
+dropped support for the `git-gateway` backend, which this invite-only, no-GitHub-account model relies
+on; Decap keeps it.)
 
 - Admin UI: **`/admin/`** (e.g. `https://ebneo.org/admin/`)
 - Config: `public/admin/config.yml`
@@ -30,7 +32,7 @@ Both are enabled once, in the Netlify dashboard for the connected site:
 That's it — no editor needs a GitHub account.
 
 ### Optional hardening
-- Pin the CMS version in `public/admin/index.html` (swap `@sveltia/cms` for `@sveltia/cms@<ver>`).
+- The CMS version is pinned in `public/admin/index.html` (`decap-cms@3.17.3`); bump deliberately.
 - Restrict uploads/roles later via Identity roles if guest authors are ever given logins.
 
 ---
@@ -100,6 +102,6 @@ The home-page rosters are a **Society** collection (two JSON files), not free-fo
 ## Local testing note
 
 `git-gateway` only works against the deployed Netlify site (it needs Identity). To preview the
-CMS form locally, Sveltia/Decap support a local proxy (`local_backend: true` + `npx @sveltia/cms-server`),
+CMS form locally, Decap supports a local proxy (`local_backend: true` + `npx decap-server`),
 but the fastest validation is on a Netlify deploy preview once steps 1–4 above are done.
 The site itself runs locally without any of this: `nvm use 22 && npm run dev`.

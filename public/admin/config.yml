@@ -1,4 +1,4 @@
-# Sveltia / Decap CMS config for EBNEO.
+# Decap CMS config for EBNEO.
 # Paths are relative to the repository root (the `site/` project).
 backend:
   name: git-gateway        # Netlify Identity + Git Gateway (no GitHub login for editors)
@@ -12,7 +12,7 @@ media_folder: "public/img/uploads"
 public_folder: "/img/uploads"
 
 site_url: https://ebneo.org
-logo_url: /img/ebneo-logo.svg
+logo_url: /img/ebneo-logo.png
 
 collections:
   - name: commentaries
@@ -111,6 +111,7 @@ collections:
               - { name: role, label: Role, widget: string }
               - { name: aff, label: Affiliation, widget: string }
               - { name: img, label: Photo, widget: image, required: false }
+              - { name: x, label: X / Twitter handle, widget: string, required: false, hint: "Handle only, no @ (e.g. ravimpatelmd). Leave blank for org or no account." }
       - name: founders
         label: Founders & Past Chairs
         file: src/data/founders.json
@@ -126,6 +127,7 @@ collections:
               - { name: role, label: Role, widget: string }
               - { name: aff, label: Affiliation, widget: string }
               - { name: img, label: Photo, widget: image, required: false }
+              - { name: x, label: X / Twitter handle, widget: string, required: false, hint: "Handle only, no @. Leave blank for org or no account." }
 
   # Monthly "Article of the Month" ballot (M4b). Authoring a new month here is the only
   # step needed to open a poll — no code change. Votes are tallied by a Netlify Function

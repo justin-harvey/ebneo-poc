@@ -6,6 +6,28 @@ why, and anything a future session needs to know.
 
 ---
 
+## 2026-11-02 — CMS engine: Sveltia → Decap (git-gateway restored) + config fixes
+
+**What:** Swapped `public/admin/index.html` to load **Decap CMS `3.17.3`** (pinned) instead of
+Sveltia. Also in `public/admin/config.yml`: added an `x` (X/Twitter handle) field to the board +
+founders `society` collections, and pointed `logo_url` at the official `/img/ebneo-logo.png`.
+Reworded `CMS-SETUP.md` to Decap (version-pin note + local proxy `npx decap-server`).
+
+**Why:** The first real CMS login attempt failed — **Sveltia dropped support for the `git-gateway`
+backend**, which the whole invite-only/no-GitHub-account editor model (and the already-enabled
+Netlify Git Gateway) depends on. Decap is the maintained Netlify-CMS fork and still supports
+git-gateway, so `config.yml` backend is unchanged and `CMS-SETUP.md` stays accurate. The `x`-field
+gap was a silent data-loss risk: 14 board handles weren't declared in the CMS, so a roster save
+could have dropped them.
+
+**For next session:** the live `/admin/` login/publish test still needs to be run end-to-end on the
+deploy (Decap renders its own "Login with Netlify Identity" button; the invite→redirect is handled by
+the Netlify Identity widget already in `Base.astro`). Caveat: Netlify Identity/Git Gateway are on a
+long-term deprecation path — fine for now, revisit before relying on it heavily. The HANDOFF.md still
+calls the CMS "Sveltia" in a few places; update when touched.
+
+---
+
 ## 2026-11-01 — M15 tail: 301s for legacy pages + news posts (no 404s at cutover)
 
 **What:** Added a labelled 301 block to `_redirects` (via `legacy_redirects.py`, one
