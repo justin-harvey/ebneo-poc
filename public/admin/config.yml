@@ -112,6 +112,7 @@ collections:
               - { name: aff, label: Affiliation, widget: string }
               - { name: img, label: Photo, widget: image, required: false }
               - { name: x, label: X / Twitter handle, widget: string, required: false, hint: "Handle only, no @ (e.g. ravimpatelmd). Leave blank for org or no account." }
+              - { name: linkedin, label: LinkedIn vanity ID, widget: string, required: false, hint: "The bit after linkedin.com/in/ — e.g. justin-harvey. Not the full URL." }
       - name: founders
         label: Founders & Past Chairs
         file: src/data/founders.json
@@ -128,6 +129,7 @@ collections:
               - { name: aff, label: Affiliation, widget: string }
               - { name: img, label: Photo, widget: image, required: false }
               - { name: x, label: X / Twitter handle, widget: string, required: false, hint: "Handle only, no @. Leave blank for org or no account." }
+              - { name: linkedin, label: LinkedIn vanity ID, widget: string, required: false, hint: "The bit after linkedin.com/in/ — e.g. justin-harvey. Not the full URL." }
 
   # Monthly "Article of the Month" ballot (M4b). Authoring a new month here is the only
   # step needed to open a poll — no code change. Votes are tallied by a Netlify Function

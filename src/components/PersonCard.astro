@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-const { name, role, aff, img, x } = Astro.props;
+const { name, role, aff, img, x, linkedin } = Astro.props;
 const initials = name.split(/\s+/).slice(0, 2).map((w: string) => w[0]).join('').toUpperCase();
 ---
 <article class="person">
@@ -12,9 +12,18 @@ const initials = name.split(/\s+/).slice(0, 2).map((w: string) => w[0]).join('')
   <h3>{name}</h3>
   <p class="role">{role}</p>
   <p class="aff">{aff}</p>
-  {x && (
-    <a class="x" href={`https://x.com/${x}`} rel="noopener" aria-label={`${name} on X`}>
-      <Icon name="twitter" />@{x}
-    </a>
+  {(x || linkedin) && (
+    <p class="social">
+      {x && (
+        <a class="x" href={`https://x.com/${x}`} rel="noopener" aria-label={`${name} on X`}>
+          <Icon name="twitter" />@{x}
+        </a>
+      )}
+      {linkedin && (
+        <a class="linkedin" href={`https://www.linkedin.com/in/${linkedin}`} rel="noopener" aria-label={`${name} on LinkedIn`}>
+          <Icon name="linkedin" />LinkedIn
+        </a>
+      )}
+    </p>
   )}
 </article>

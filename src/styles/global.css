@@ -193,10 +193,11 @@ footer small{color:#7fa6b6;font-size:.82rem}
 .goal p{margin:0;color:var(--ink-soft);font-size:.95rem;line-height:1.5}
 
 /* X / social link on person cards */
-.person .x{display:inline-flex;align-items:center;gap:.35em;margin-top:10px;
+.person .social{display:flex;flex-wrap:wrap;gap:.3em .9em;margin:10px 0 0}
+.person .social a{display:inline-flex;align-items:center;gap:.35em;
   font-size:.8rem;font-weight:600;color:var(--teal-dark);text-decoration:none}
-.person .x:hover{color:var(--teal)}
-.person .x .icon{width:.95em;height:.95em}
+.person .social a:hover{color:var(--teal)}
+.person .social .icon{width:.95em;height:.95em}
 
 @media (max-width:860px){
   footer .fcols{grid-template-columns:1fr 1fr}

@@ -6,6 +6,20 @@ why, and anything a future session needs to know.
 
 ---
 
+## 2026-11-02 — Board/founders: LinkedIn alongside X on PersonCard
+
+**What:** Added an optional **LinkedIn** social link to the board + founders cards, next to the
+existing X/Twitter link. `PersonCard.astro` now wraps both in a `.social` flex row; `Icon.astro`
+gained a Feather-style `linkedin` glyph; `global.css` `.person .x` rule generalised to `.person
+.social a`. CMS `config.yml` has a `linkedin` field on both `society` collections (stores the vanity
+ID after `linkedin.com/in/`, not a full URL — mirrors the `x` handle-only convention).
+
+**Why:** Requested — board members want LinkedIn shown too. No data entered yet (0 rendered); add
+per-member via `/admin/` → Society, or directly in `src/data/board.json`/`founders.json`. Build green
+at 206 pages; home still renders 14 X links, 0 LinkedIn until populated.
+
+---
+
 ## 2026-11-02 — CMS engine: Sveltia → Decap (git-gateway restored) + config fixes
 
 **What:** Swapped `public/admin/index.html` to load **Decap CMS `3.17.3`** (pinned) instead of
