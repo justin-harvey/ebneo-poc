@@ -6,6 +6,26 @@ why, and anything a future session needs to know.
 
 ---
 
+## 2026-11-01 — M15 tail: 301s for legacy pages + news posts (no 404s at cutover)
+
+**What:** Added a labelled 301 block to `_redirects` (via `legacy_redirects.py`, one
+level up) so no old WordPress URL 404s at the DNS cutover: 19 legacy pages, 2 tag-archive
+wildcards, the external `/twitter/` → X, and 46 news/announcement posts → `/about/`
+(the preserved `.../gordon-guyatt` video page is excluded — it's a real route).
+
+**Dispositions (per Justin):** conferences → `/about/`; `/membership/` + `/checkout/*`
+deferred (301 to `/about/`/`/`, membership model to be vetted with the client);
+`/archive/` + tag archives → `/reviews/`; `/contribute/`,`/newsletters/`,`/welcome/` → `/`.
+Two pages left un-redirected pending a content check: `/developing-countries/` and the
+`/documents/` *page*. `_redirects` is now 323 lines; build green at 206 pages.
+
+**Why:** M15 is the launch-blocking pre-cutover audit; stray old URLs would drop link
+equity and break inbound links. This clears the last bulk piece before go-live.
+
+**Files:** `public/_redirects`.
+
+---
+
 ## 2026-11-01 — Add "Article of the Year" to the top nav
 
 **What:** `/impact/` (Article of the Year) was only linked in the footer, not the
