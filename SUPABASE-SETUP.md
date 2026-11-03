@@ -4,9 +4,9 @@ Operational reference for the Supabase-backed headless CMS. Pairs with the
 milestone plan (`../SUPABASE-CMS-PLAN.md`) and handoff (`../SUPABASE-CMS-HANDOFF.md`),
 which live one level up and are **not** tracked in this deploy repo.
 
-**Status:** S0–S4 complete. Schema applied, 196 rows imported, byte-identical build from
-Supabase, invite-only passwordless auth + RLS verified, and the `/studio` React admin is
-built and smoke-tested. S5 (publish -> debounced Netlify build hook) next.
+**Status:** S0–S5 complete. Schema applied, 196 rows imported, byte-identical build from
+Supabase, invite-only passwordless auth + RLS verified, `/studio` admin built, and the
+publish -> rebuild pipeline is armed (needs the Netlify Build Hook URL set once). S6/S7 remain.
 
 ## 0. Project coordinates
 
@@ -190,10 +190,26 @@ Smoke-tested 2026-11-02 (headless Chromium): app mounts, login screen renders, *
 JS errors**. Remaining QA = the logged-in flow through the real UI (list/edit/publish/
 upload), best done live via magic link after deploy, or a headless authed test.
 
-## 9. What's next
+## 9. Publish -> rebuild pipeline (S5)
 
-- **S5:** publish -> **debounced Netlify Build Hook** (DB webhook or Edge Function);
-  show the editor a "publishing, live in a minute" state.
+Pure SQL, no Edge Function: `supabase/migrations/0003_deploy_trigger.sql` adds `pg_net`,
+a locked-down `deploy_control` table (holds the hook URL + debounce window; RLS denies
+all, only SECURITY DEFINER functions read it), a trigger on `commentaries`
+(`commentaries_deploy`) that POSTs the Netlify Build Hook when the **published set could
+change** (publish / edit-while-published / unpublish / delete), **debounced** (default
+60s) so edit bursts don't stampede builds, and `request_deploy()` (RPC, editors only) for
+the admin's manual **"Deploy site now"** button.
+
+**One-time setup — set the hook URL:** in Netlify, Site config -> Build & deploy -> Build
+hooks -> Add build hook, copy the URL, then run (service role / Management API):
+```
+update public.deploy_control set hook_url = 'https://api.netlify.com/build_hooks/XXXX' where id = 1;
+```
+Until that is set the trigger is a safe no-op. Verified 2026-11-03: publish fires exactly
+one build, a rapid second write is debounced (one POST total), hook reset to null after test.
+
+## 10. What's next
+
 - **S6 (optional):** rosters + polls into Supabase.
-- **S7:** remove Decap/`public/admin/`, custom SMTP, backups/PITR, security pass
-  (re-run `verify-rls.mjs`), rewrite editor guide.
+- **S7:** remove Decap/`public/admin/`, custom SMTP, backups/PITR + tested restore,
+  security pass (re-run `verify-rls.mjs`), rewrite editor guide.

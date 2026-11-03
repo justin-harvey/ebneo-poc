@@ -143,6 +143,20 @@ function CommentaryList({ onOpen, onNew, role }) {
   const [rows, setRows] = useState(null);
   const [q, setQ] = useState('');
   const [err, setErr] = useState('');
+  const [deploying, setDeploying] = useState(false);
+  const [deployMsg, setDeployMsg] = useState(null);
+
+  async function deployNow() {
+    setDeploying(true); setDeployMsg(null);
+    const { data, error } = await supabase.rpc('request_deploy');
+    setDeploying(false);
+    if (error) { setDeployMsg({ kind: 'err', text: error.message }); return; }
+    setDeployMsg(
+      data === 'triggered'
+        ? { kind: 'ok', text: 'Rebuild started. The live site updates in a minute or two.' }
+        : { kind: 'info', text: 'Automatic publishing isn’t switched on yet. Ask an administrator to add the Netlify build hook.' },
+    );
+  }
 
   useEffect(() => {
     supabase
@@ -170,8 +184,12 @@ function CommentaryList({ onOpen, onNew, role }) {
           value={q} onChange={(e) => setQ(e.target.value)}
         />
         <div className="st-spacer" />
+        <button className="st-btn" onClick={deployNow} disabled={deploying} title="Rebuild the live site now">
+          {deploying ? 'Starting…' : '↻ Deploy site now'}
+        </button>
         <button className="st-btn primary" onClick={onNew}>+ New commentary</button>
       </div>
+      {deployMsg && <div className={`st-note ${deployMsg.kind}`}>{deployMsg.text}</div>}
       {err && <div className="st-note err">{err}</div>}
       {!rows && <div className="st-card">Loading…</div>}
       {rows && (
@@ -289,8 +307,8 @@ function Editor({ id, userId, onBack }) {
     setMsg({
       kind: 'ok',
       text: newStatus === 'published'
-        ? 'Published. Your page will appear on the live site after the next build (a minute or two).'
-        : 'Draft saved.',
+        ? 'Published. A rebuild has started automatically; your page will be live on the site in a minute or two.'
+        : 'Draft saved. Drafts are not shown on the public site until you publish.',
     });
     if (isNew) setTimeout(onBack, 900);
   }
