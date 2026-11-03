@@ -1,7 +1,22 @@
 {
   "members": [
-  { "name": "Haresh Kirpalani", "role": "Founder / Past Chair", "aff": "University of Pennsylvania, USA", "img": "/img/haresh-kirpalani.png" },
-  { "name": "Mikael Norman", "role": "Founder / Past Chair", "aff": "Karolinska Institutet, Sweden", "img": "/img/mikael-norman.png" },
-  { "name": "Elaine Boyle", "role": "Founder / Past Chair", "aff": "University of Leicester, England", "img": "/img/elaine-boyle.png" }
+    {
+      "name": "Haresh Kirpalani",
+      "role": "Founder / Past Chair",
+      "aff": "University of Pennsylvania, USA",
+      "img": "/img/haresh-kirpalani.png"
+    },
+    {
+      "name": "Mikael Norman",
+      "role": "Founder / Past Chair",
+      "aff": "Karolinska Institutet, Sweden",
+      "img": "/img/mikael-norman.png"
+    },
+    {
+      "name": "Elaine Boyle",
+      "role": "Founder / Past Chair",
+      "aff": "University of Leicester, England",
+      "img": "/img/elaine-boyle.png"
+    }
   ]
 }
