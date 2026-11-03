@@ -291,10 +291,14 @@ function Editor({ id, userId, onBack }) {
       status: newStatus, needs_review: row.needs_review || false,
       body: row.body || '',
     };
-    let error;
-    if (isNew || !row.id) {
+    // Decide insert vs update purely on whether we already have a row id. After a
+    // new doc's first save we capture the id below, so saving again updates it
+    // (rather than re-inserting and hitting a duplicate-slug error).
+    let error, inserted;
+    if (!row.id) {
       payload.author_id = userId;
-      ({ error } = await supabase.from('commentaries').insert(payload));
+      ({ data: inserted, error } = await supabase
+        .from('commentaries').insert(payload).select('id').single());
     } else {
       ({ error } = await supabase.from('commentaries').update(payload).eq('id', row.id));
     }
@@ -304,13 +308,13 @@ function Editor({ id, userId, onBack }) {
       setMsg({ kind: 'err', text: dup ? 'That slug is already used by another commentary. Choose a different one.' : error.message });
       return;
     }
+    if (inserted?.id) { setRow((r) => ({ ...r, id: inserted.id })); setSlugTouched(true); }
     setMsg({
       kind: 'ok',
       text: newStatus === 'published'
         ? 'Published. A rebuild has started automatically; your page will be live on the site in a minute or two.'
         : 'Draft saved. Drafts are not shown on the public site until you publish.',
     });
-    if (isNew) setTimeout(onBack, 900);
   }
 
   async function remove() {
@@ -333,7 +337,7 @@ function Editor({ id, userId, onBack }) {
         <span className={`st-badge ${row.status}`}>{row.status}</span>
         <button className="st-btn" onClick={() => save('draft')} disabled={busy}>Save draft</button>
         <button className="st-btn primary" onClick={() => save('published')} disabled={busy}>Publish</button>
-        {!isNew && <button className="st-btn danger" onClick={remove} disabled={busy}>Delete</button>}
+        {row.id && <button className="st-btn danger" onClick={remove} disabled={busy}>Delete</button>}
       </div>
 
       {msg && <div className={`st-note ${msg.kind}`}>{msg.text}</div>}
@@ -351,7 +355,7 @@ function Editor({ id, userId, onBack }) {
             />
             <p className="st-help">
               This becomes ebneo.org/<b>{row.slug || 'your-slug'}</b>/.
-              {!isNew && ' Changing it changes the page’s web address.'}
+              {row.id && ' Changing it changes the page’s web address.'}
             </p>
 
             <div className="st-row">

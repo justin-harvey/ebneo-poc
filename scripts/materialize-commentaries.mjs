@@ -86,6 +86,15 @@ async function main() {
     process.exit(1);
   }
 
+  // Safety guard: a published archive is never legitimately empty. If the query
+  // returns zero rows (e.g. a transient issue or misconfiguration), do NOT proceed
+  // to the cleanup step below, which would delete every .md and ship an empty site.
+  if (rows.length === 0) {
+    console.error('Refusing to continue: 0 published commentaries returned. ' +
+      'This would wipe the archive. Aborting the build.');
+    process.exit(1);
+  }
+
   await mkdir(OUT_DIR, { recursive: true });
 
   // Keep the output dir an exact mirror of published rows: remove .md files that
