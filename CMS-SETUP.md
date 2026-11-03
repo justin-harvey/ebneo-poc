@@ -1,107 +1,97 @@
-# EBNEO CMS — setup & editor guide (M2)
+# EBNEO CMS — editor guide (Supabase Studio)
 
-The site uses **Decap CMS** (the maintained fork of Netlify CMS). It is
-Git-based: editors fill a form in the browser, and every save becomes a commit that triggers a
-Netlify build. No database, no server, no WordPress plugins. (Sveltia CMS was evaluated first but
-dropped support for the `git-gateway` backend, which this invite-only, no-GitHub-account model relies
-on; Decap keeps it.)
+The site is edited through **EBNEO Studio**, a simple web form at **`/studio`**
+(e.g. `https://ebneo.org/studio`). You log in with your email, no password to
+remember and no GitHub account needed. Everything you write is saved to a secure
+database (Supabase); when you publish, the live website rebuilds on its own a
+minute or two later.
 
-- Admin UI: **`/admin/`** (e.g. `https://ebneo.org/admin/`)
-- Config: `public/admin/config.yml`
-- Content lives in: `src/content/commentaries/*.md`
+- Editor app: **`/studio`**
+- You need to be **invited** first (invite-only). Ask an admin to add your email.
+- Commentaries are stored in the database and rebuilt into the site at build time.
 
----
-
-## One-time Netlify setup (dashboard — ~10 min)
-
-The CMS authenticates editors with **Netlify Identity** and writes to Git via **Git Gateway**.
-Both are enabled once, in the Netlify dashboard for the connected site:
-
-1. **Connect the repo** (if not already): Netlify → *Add new site → Import an existing project →*
-   GitHub → select the `site/` repo. Build settings auto-fill from `netlify.toml`
-   (command `npm run build`, publish `dist`, Node 22).
-2. **Enable Identity:** Site config → *Identity* → **Enable Identity**.
-3. **Registration:** Identity → *Registration preferences* → **Invite only**
-   (editors are invited; the public can't self-register).
-4. **Enable Git Gateway:** Identity → *Services* → **Enable Git Gateway**.
-   (This is what lets the browser CMS commit to the repo on the editor's behalf.)
-5. **Invite editors:** Identity → *Invite users* → enter each staffer's email.
-   They get an email, set a password, and are redirected into `/admin/` (handled by the
-   Netlify Identity snippet in `src/layouts/Base.astro`).
-
-That's it — no editor needs a GitHub account.
-
-### Optional hardening
-- The CMS version is pinned in `public/admin/index.html` (`decap-cms@3.17.3`); bump deliberately.
-- Restrict uploads/roles later via Identity roles if guest authors are ever given logins.
+> This replaces the older Decap / Netlify Identity CMS. If you remember logging in
+> at `/admin/` with a password, that system is gone; use `/studio` now.
 
 ---
 
-## Publishing a commentary (editor workflow)
+## Logging in
 
-1. Go to `/admin/`, log in.
-2. **Commentaries → New Commentary.**
-3. Fill the form: Title, Publish date, Type of investigation, PMID/DOI (optional), reviewer email.
-4. The **Commentary (structured)** body opens pre-filled with the 9 section headings
-   (Citation, Reviewed By, Type of Investigation, Question, Methods, Main Results, Conclusion,
-   Commentary, References). Paste each section under its heading. Keep the headings.
-5. **Save** → the entry enters the editorial workflow (Draft).
-6. Move it **Draft → In review → Ready**. Each stage pushes a branch and Netlify builds a
-   **deploy preview** so you can see the rendered page before it's public.
-7. **Publish** → merges to `main` → the live site rebuilds (~1–2 min). The commentary appears
-   in the Reviews archive automatically (filters/search index it on build).
+1. Go to **`/studio`**.
+2. Type the email address you were invited with and press **Send magic link**.
+3. Check your inbox for an email from EBNEO / Supabase and click the link. It
+   brings you straight back into Studio, signed in.
+4. If the link does not arrive, wait a minute and try again, or ask an admin to
+   re-send the invite. (The email allowance is small on our current plan; a
+   handful of logins per hour.)
 
-New posts get a clean title-based URL. The 83 migrated commentaries keep their original
-`ebneo.org/ebneo-commentary-…` slugs so existing links and SEO are preserved.
+Only invited editors can see or change anything. If someone who was not invited
+signs in, they see nothing.
 
 ---
 
-## Running the monthly poll (Vote)
+## Writing or editing a commentary
 
-The `/vote` page shows the **newest poll with `status: open`** as the live ballot and lists every
-other poll in the "Past polls" archive. Opening a poll is pure content — no code.
+1. From the list, click an existing commentary to edit it, or click
+   **+ New commentary** to start a fresh one.
+2. Fill in the fields:
+   - **Title** (the slug / web address fills in automatically from the title; you
+     can edit it, but once a commentary is live, changing the slug changes its URL).
+   - **Publish date**, **Type of investigation** (suggestions like Treatment,
+     Prevention, Diagnosis appear as you type), **PMID** / **DOI** (optional),
+     **Reviewer email**.
+   - **Needs review** checkbox: tick this to flag a commentary for a second pair of
+     eyes. It does not stop publishing; it is just a marker shown in the list.
+3. **Commentary text** opens pre-filled with the nine standard section headings:
+   Citation, Reviewed By, Investigation, Question, Methods, Main Results,
+   Conclusion, Commentary, References. Write under each `## Heading` and keep the
+   headings. The checklist above the box ticks green as each section is present.
+4. **Upload figure** adds an image to the end of the text. Cut and paste the line
+   it inserts to wherever you want the figure to sit.
+5. The **Live preview** on the right shows roughly how it will read. The real site
+   styles it to match EBNEO.
 
-**Open a new monthly poll**
-1. `/admin/` → **Polls (Vote) → New Poll**.
-2. **Month** = the ballot month, e.g. `2026-11` (this is the ballot's key and sort order).
-3. **Question** — keep the default or edit it.
-4. **Candidate studies** — add 2–3 studies (title + optional authors, journal, date, link).
-   ⚠️ **Do not reorder the studies after voting starts** — a study's position is its vote id,
-   so reordering would reassign existing votes.
-5. **Status = open.** Save and publish. It becomes the live ballot; any previously open poll
-   should be closed (next step) so only one is open at a time.
+### Saving vs publishing
 
-**Close a poll**
-- Edit the poll, set **Status = closed**, publish. It drops into "Past polls" and stops accepting
-  votes. Results keep loading live from the tally store.
-
-**Freeze final results (optional)** — if you ever want a closed poll's numbers baked into the page
-(e.g. before retiring the vote backend), add a `results` block to the file's front-matter mapping
-each study's index to its vote count, and the archive renders those bars statically:
-```yaml
-results:
-  "0": 86   # first study
-  "1": 54   # second study
-```
-
-**How votes are stored:** a Netlify Function (`netlify/functions/vote.mjs`) tallies votes in
-**Netlify Blobs**, keyed by month. One vote per browser (a cookie, matching the old site — not
-fraud-proof). See `RUNBOOK.md` for resetting or exporting tallies.
+- **Save draft** keeps your work in the database but does **not** show it on the
+  public site. Drafts are safe to leave half-finished.
+- **Publish** makes it public. A site rebuild starts automatically and the page is
+  live in a minute or two.
+- **Delete** removes a commentary for good (you get a confirmation prompt first).
 
 ---
 
-## Editing the board & founders (home page)
+## Pushing a rebuild yourself
 
-The home-page rosters are a **Society** collection (two JSON files), not free-form pages:
-- `/admin/` → **Society → Executive Board** or **Founders & Past Chairs**.
-- Add/remove/reorder members; each has Name, Role, Affiliation, and an optional Photo.
-- Photos upload to `public/img/uploads/`. Save & publish → the home page rebuilds.
+Publishing already triggers a rebuild. If you ever need to force one (for example
+after several quick edits), use **↻ Deploy site now** at the top of the list. One
+rebuild covers everything saved up to that point.
 
 ---
 
-## Local testing note
+## What is no longer here
 
-`git-gateway` only works against the deployed Netlify site (it needs Identity). To preview the
-CMS form locally, Decap supports a local proxy (`local_backend: true` + `npx decap-server`),
-but the fastest validation is on a Netlify deploy preview once steps 1–4 above are done.
-The site itself runs locally without any of this: `nvm use 22 && npm run dev`.
+- **The monthly poll (`/vote`)** and the **board / founders rosters** are not yet in
+  Studio. For now they are still managed as before (poll tallies live in Netlify,
+  rosters in the repo JSON files). Moving them into Studio is a planned follow-up.
+  See `RUNBOOK.md` for the poll, and the project handoff for the roster plan.
+
+---
+
+## For admins / developers
+
+- **Invite an editor** (needs the Supabase service-role key in your shell):
+  ```
+  SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+  node scripts/invite-editor.mjs <email> [editor|admin]
+  ```
+  `admin` can also manage the editor roster; `editor` can write commentaries.
+- **How publishing reaches the live site:** Studio writes to Supabase; a database
+  trigger calls the Netlify build hook; Netlify runs `npm run materialize`, which
+  pulls the published rows back into `src/content/commentaries/*.md`, then builds the
+  static site. Nothing the public sees is served live from the database.
+- Full operational detail (coordinates, keys, schema, RLS, the publish pipeline) is
+  in **`SUPABASE-SETUP.md`**. The milestone plan and handoff live one level up, outside
+  this deploy repo.
+- **Local dev:** `nvm use 22 && npm run dev`. The public site builds without any
+  database access; only `npm run materialize` (and the Netlify build) touch Supabase.

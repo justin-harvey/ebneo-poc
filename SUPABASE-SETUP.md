@@ -211,5 +211,13 @@ one build, a rapid second write is debounced (one POST total), hook reset to nul
 ## 10. What's next
 
 - **S6 (optional):** rosters + polls into Supabase.
-- **S7:** remove Decap/`public/admin/`, custom SMTP, backups/PITR + tested restore,
-  security pass (re-run `verify-rls.mjs`), rewrite editor guide.
+- **S7 (in progress):**
+  - ✅ Decap decommissioned: `public/admin/` (config.yml + index.html) deleted, the
+    Netlify Identity widget removed from `src/layouts/Base.astro`, `robots.txt` now
+    disallows `/studio/` instead of `/admin/`. DB-free build verified (207 pages, 196
+    commentaries indexed); no `netlify-identity` refs remain in `dist/`.
+  - ✅ `CMS-SETUP.md` rewritten as a plain-language Supabase Studio editor guide.
+  - ⬜ Custom SMTP in the Supabase dashboard (Auth → SMTP) — needs dashboard access.
+  - ⬜ Backups (PITR/dumps) + a tested restore — needs dashboard access (PITR is paid;
+    on free tier use scheduled logical dumps).
+  - ⬜ Re-run `verify-rls.mjs` as the final security check — needs the keys.

@@ -2,6 +2,6 @@
 User-agent: *
 Allow: /
 # The CMS app is not content.
-Disallow: /admin/
+Disallow: /studio/
 
 Sitemap: https://ebneo.org/sitemap.xml
