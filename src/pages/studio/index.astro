@@ -1,0 +1,20 @@
+---
+// EBNEO CMS admin shell (plan S4).
+// Renders a minimal, noindex HTML page and boots the React SPA entirely in the
+// browser (client:only) so no DB call or secret happens at build/SSR time.
+import StudioApp from '../../components/studio/StudioApp.jsx';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>EBNEO Studio</title>
+    <link rel="icon" href="/img/ebneo-mark.png" />
+  </head>
+  <body>
+    <StudioApp client:only="react" />
+  </body>
+</html>

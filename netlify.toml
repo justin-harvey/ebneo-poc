@@ -1,5 +1,10 @@
 [build]
-  command = "npm run build"
+  # S2: materialize published commentaries from Supabase into
+  # src/content/commentaries/*.md, then run the normal Astro+Pagefind build.
+  # Requires SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY in the Netlify build env;
+  # the materialize step fails loudly if they are missing (no stale content).
+  # `npm run build` alone stays DB-free for local dev.
+  command = "npm run materialize && npm run build"
   publish = "dist"
 
 [build.environment]
