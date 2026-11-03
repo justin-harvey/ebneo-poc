@@ -69,12 +69,35 @@ rebuild covers everything saved up to that point.
 
 ---
 
-## What is no longer here
+## The Board & Founders lists
 
-- **The monthly poll (`/vote`)** and the **board / founders rosters** are not yet in
-  Studio. For now they are still managed as before (poll tallies live in Netlify,
-  rosters in the repo JSON files). Moving them into Studio is a planned follow-up.
-  See `RUNBOOK.md` for the poll, and the project handoff for the roster plan.
+The home-page people lists are edited under the **Board & Founders** tab.
+
+1. Pick **Executive Board** or **Founders & Past Chairs**.
+2. Edit a person's name, role, affiliation, X handle, LinkedIn, and photo. Use
+   **Upload photo** to add a new headshot, or paste an image path.
+3. Use the **↑ / ↓** arrows to reorder people, **+ Add person** to add one, and
+   **Remove** to drop one.
+4. Click **Save list** for that group. A rebuild starts and the home page updates
+   in a minute or two. (Save each list separately.)
+
+## The monthly poll (Vote)
+
+The monthly Article-of-the-Month ballot is edited under the **Polls** tab.
+
+1. **+ New poll** to open a ballot. Set the **ballot month** (e.g. `2026-11`), the
+   question, and **Status = Open**. Only one poll should be open at a time; set the
+   previous one to **Closed**.
+2. Add 2 or more **candidate studies** (title, authors, journal, date, link).
+   The order is permanent once voting opens, so add or remove studies from the end
+   before the poll goes live and do not reorder afterwards.
+3. **Save poll.** The newest open poll becomes the live ballot on `/vote`; closed
+   polls move to the archive.
+4. To freeze a closed poll's final numbers on the archived page, set each study's
+   **Final vote count** (shown when Status is Closed) and save.
+
+Live votes are tallied in Supabase and shown on the public `/vote` page; one vote
+per browser (a cookie, not fraud-proof), matching the previous site.
 
 ---
 

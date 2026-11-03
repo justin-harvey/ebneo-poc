@@ -5,14 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "materialize": "node scripts/materialize-commentaries.mjs",
+    "materialize": "node scripts/materialize-commentaries.mjs && node scripts/materialize-rosters.mjs && node scripts/materialize-polls.mjs",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/react": "^3.6.3",
-    "@netlify/blobs": "^8.2.0",
     "@supabase/supabase-js": "^2.118.0",
     "astro": "^4.15.0",
     "gray-matter": "^4.0.3",

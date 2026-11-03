@@ -6,7 +6,9 @@ which live one level up and are **not** tracked in this deploy repo.
 
 **Status:** S0–S5 complete. Schema applied, 196 rows imported, byte-identical build from
 Supabase, invite-only passwordless auth + RLS verified, `/studio` admin built, and the
-publish -> rebuild pipeline is armed (needs the Netlify Build Hook URL set once). S6/S7 remain.
+publish -> rebuild pipeline is armed (needs the Netlify Build Hook URL set once). **S6 (rosters +
+polls) built** (code done + DB-free build verified; needs migration applied + ETL run). S7
+partially done (Decap removed, editor guide rewritten); SMTP/backups/RLS-rerun remain.
 
 ## 0. Project coordinates
 
@@ -208,9 +210,47 @@ update public.deploy_control set hook_url = 'https://api.netlify.com/build_hooks
 Until that is set the trigger is a safe no-op. Verified 2026-11-03: publish fires exactly
 one build, a rapid second write is debounced (one POST total), hook reset to null after test.
 
-## 10. What's next
+## 10. Rosters + polls (S6)
 
-- **S6 (optional):** rosters + polls into Supabase.
+`supabase/migrations/0004_rosters_polls.sql` adds three tables and moves the last two content
+stores off JSON/Netlify Blobs onto Supabase:
+
+- **`roster_members`** (`grp` = board|founders, name/role/aff/img/x/linkedin, `sort_order`) — the
+  home-page Executive Board + Founders lists. Materialized to `src/data/board.json` /
+  `founders.json` at build. Editor-only RLS (reuses `is_editor()`).
+- **`polls`** (`month` unique, question, `status` open|closed, `options` jsonb, optional frozen
+  `results`, `body`) — the monthly ballots. Materialized to `src/content/polls/*.md` at build.
+  Editor-only RLS.
+- **`poll_tallies`** (`month` PK, `tallies` jsonb) — live runtime vote counts, replacing the
+  Netlify Blobs store. Written only by the `/api/vote` + `/api/results` functions via the
+  service-role key. RLS denies everyone (service role bypasses); never read by the browser.
+
+Both content tables fire the S5 debounced deploy via a status-agnostic `trigger_deploy_always()`
+(any change rebuilds; safe no-op until the hook URL is set).
+
+**Apply + migrate (one-time, service-role / Management PAT):**
+```
+# 1. apply the migration (dashboard SQL editor or Management API)
+#    -> supabase/migrations/0004_rosters_polls.sql
+# 2. import the existing data (idempotent):
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/etl-import-rosters.mjs
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/etl-import-polls.mjs
+```
+Both ETL scripts take `--dry-run` (no creds, validates the parse). Build wiring: `npm run
+materialize` now runs all three materializers (commentaries + rosters + polls). Admin: `/studio`
+gains **Board & Founders** and **Polls** tabs.
+
+Round-trip verified offline 2026-11-03: poll materialize is byte-identical to the seed `.md`;
+`board.json` byte-identical; `founders.json` re-emitted in clean 2-space JSON (values identical, so
+the rendered home page is unchanged). **Deploy ordering:** apply the migration + run both ETL
+imports **before** the first deploy that ships the new `/api/vote` functions, or voting 500s until
+the tables exist. (Nothing deploys until pushed, so this is controllable.)
+
+Old Netlify Blobs store `ebneo-polls` is retired; `@netlify/blobs` dropped from `package.json`.
+The live `2026-11` test votes in Blobs are not migrated (they get wiped at launch anyway).
+
+## 11. What's next
+
 - **S7 (in progress):**
   - ✅ Decap decommissioned: `public/admin/` (config.yml + index.html) deleted, the
     Netlify Identity widget removed from `src/layouts/Base.astro`, `robots.txt` now

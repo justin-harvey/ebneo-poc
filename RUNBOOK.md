@@ -7,17 +7,20 @@ Ops reference for the static Astro site deployed on Netlify. Day-to-day editing 
 - **Repo:** `justin-harvey/ebneo-poc` (`main`). Netlify builds `main` on every push.
 - **Build:** `npm run build` → `astro build && pagefind --site dist`; publish dir `dist`; Node 22
   (all pinned in `netlify.toml`).
-- **Hosting:** Netlify (CDN + Functions + Blobs + Identity/Git Gateway for the CMS).
-- **Source of truth:** Git. The site, content (`src/content/**`), and roster JSON are all in the repo.
-  The **only** state that lives outside Git is the poll vote tallies (Netlify Blobs).
+- **Hosting:** Netlify (CDN + Functions). Auth + content live in **Supabase** (see `SUPABASE-SETUP.md`).
+- **Source of truth:** **Supabase.** Commentaries, the Board/Founders rosters, and the monthly polls
+  all live in Postgres; the build **materializes** them into `src/content/**` and `src/data/*.json`
+  (those files are build artifacts, though committed copies serve local dev). The site code is in Git;
+  live poll vote tallies live in Supabase (`poll_tallies`).
 - **Live preview URL:** `ebneo-poc.netlify.app` (custom domain `ebneo.org` set in Netlify DNS at launch).
 
 ## Deploy
-- **Normal:** merge/push to `main` → Netlify builds and publishes (~1–2 min). CMS "Publish" does this
-  for you by committing to `main`.
+- **Normal:** merge/push to `main` → Netlify builds and publishes (~1–2 min). Editors never touch Git:
+  publishing in `/studio` writes to Supabase, which fires a debounced Netlify build hook (S5), and the
+  build materializes the latest content. "Deploy site now" in `/studio` forces a rebuild.
 - **Manual:** Netlify dashboard → *Deploys → Trigger deploy → Deploy site*.
-- **Preview a change first:** open a PR / use the CMS editorial workflow → Netlify posts a
-  **deploy preview** URL per branch. Nothing is public until it hits `main`.
+- **Preview code changes:** open a PR → Netlify posts a **deploy preview** URL per branch. Nothing is
+  public until it hits `main`. (Content/roster/poll edits go live via the Supabase publish path above.)
 
 ## Rollback
 The fastest, safest rollback is Netlify's, because content and code are both in the deploy:
@@ -27,28 +30,32 @@ The fastest, safest rollback is Netlify's, because content and code are both in 
 3. A reverted CMS content change is just a revert of that content commit.
 
 ## Backups
-- **Code + content + rosters:** the Git repo *is* the backup. Optionally mirror to a second remote.
-- **Uploaded images:** committed under `public/img/uploads/` → covered by Git.
-- **Vote tallies (Blobs):** the one thing **not** in Git. If tallies matter long-term, export them
-  (see below) or freeze them into each poll's front-matter `results:` when you close it
-  (`CMS-SETUP.md` → "Freeze final results"). Frozen results are then in Git like everything else.
+- **Code:** the Git repo. Optionally mirror to a second remote.
+- **Content, rosters, polls, editor accounts, vote tallies:** all in **Supabase** now. Back these up
+  with Supabase dumps / PITR (tracked in S7). The committed `src/content/**` + `src/data/*.json` are a
+  recent materialized snapshot, so Git is a coarse secondary copy of published content.
+- **Uploaded images:** legacy figures committed under `public/img/uploads/` (Git); new uploads go to
+  the Supabase `figures` bucket (back up with Storage).
 
-## Voting backend (Functions + Netlify Blobs)
-- Endpoints (routes set in-code via `export const config`):
+## Voting backend (Functions + Supabase)
+- Endpoints (routes set in-code via `export const config`), unchanged public contract:
   - `POST /api/vote` — body `{ "month": "2026-11", "option": 0 }` → increments a tally; sets a
     180-day `ebneo_voted_<month>` cookie (one vote per browser).
   - `GET /api/results?month=2026-11` → `{ "month", "tallies": { "0": n, ... } }`.
-- Store: Netlify Blobs store **`ebneo-polls`**, one JSON object per month (`{ optionIndex: count }`).
-  Auto-provisions with the site; no setup, no cost tier to pick.
+- Store: Supabase table **`public.poll_tallies`** (`month` PK, `tallies` jsonb `{ optionIndex: count }`).
+  The functions read/write it with the **service-role key** (needs `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` in the Netlify site env, which the build already sets). RLS denies
+  everyone else, so the browser never reads tallies directly.
 - **Quick health check** (replace host with the live domain):
   ```bash
   curl -s "https://ebneo.org/api/results?month=$(date +%Y-%m)"
   ```
-- **Export tallies:** `GET /api/results?month=YYYY-MM` for each month and save the JSON.
-- **Reset / edit a tally:** there is no admin endpoint by design. To wipe or correct a month, use the
-  Netlify CLI against the site: `netlify blobs:delete ebneo-polls <YYYY-MM>` (or `blobs:set` to
-  overwrite). Starting a fresh month (`status: open` under a new `month`) always begins at zero, so a
-  reset is rarely needed. Treat the cookie dedupe as best-effort, not a security control.
+- **Export tallies:** `GET /api/results?month=YYYY-MM`, or query `poll_tallies` in the Supabase dashboard.
+- **Reset / edit a tally:** no public admin endpoint by design. Edit the `poll_tallies` row in the
+  Supabase SQL editor (e.g. `delete from poll_tallies where month = '2026-11';` to wipe a month). A
+  fresh month (`status: open` under a new `month`) starts at zero. Freezing a closed poll's final
+  numbers into its `results` (via `/studio` → Polls) bakes them into the static archive page. Treat
+  the cookie dedupe as best-effort, not a security control.
 
 ## Redirects
 - `public/_redirects` holds the legacy WordPress → new-slug 301s (dated `/YYYY/MM/...` URLs) plus the

@@ -76,6 +76,13 @@ body{margin:0}
 .st-toolbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .st-spacer{flex:1}
 a.st-link{color:${BRAND_BLUE}}
+.st-tabs{display:flex;gap:.3rem;margin-bottom:1.2rem;border-bottom:1px solid #e2e8ee}
+.st-tab{padding:.55rem 1rem;border:0;background:transparent;font-size:.92rem;font-weight:600;color:#6b7a88;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.st-tab:hover{color:#1a2b3c}
+.st-tab.active{color:${BRAND_BLUE};border-bottom-color:${BRAND_BLUE}}
+.st-member{display:flex;gap:.6rem;padding:.8rem 0;border-top:1px solid #eef2f5}
+.st-member-move{display:flex;flex-direction:column;gap:.3rem}
+.st-member-fields{flex:1}
 `;
 
 function Styles() {
@@ -422,10 +429,328 @@ function Editor({ id, userId, onBack }) {
   );
 }
 
+// ---------------------------------------------------------------- shared field
+function Field({ label, value, onChange, type = 'text', placeholder, list, help }) {
+  return (
+    <>
+      <label className="st-label">{label}</label>
+      <input
+        className="st-input" type={type} list={list} value={value ?? ''}
+        placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
+      />
+      {help && <p className="st-help">{help}</p>}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- rosters
+const ROSTER_GROUPS = [
+  { grp: 'board', label: 'Executive Board' },
+  { grp: 'founders', label: 'Founders & Past Chairs' },
+];
+
+function RosterManager() {
+  const [members, setMembers] = useState(null);
+  const [err, setErr] = useState('');
+  const [msg, setMsg] = useState(null);
+  const [savingGrp, setSavingGrp] = useState(null);
+  const [uploadingId, setUploadingId] = useState(null);
+
+  function load() {
+    supabase.from('roster_members')
+      .select('id,grp,name,role,aff,img,x,linkedin,sort_order')
+      .order('grp', { ascending: true }).order('sort_order', { ascending: true })
+      .then(({ data, error }) => { if (error) setErr(error.message); else setMembers(data || []); });
+  }
+  useEffect(load, []);
+
+  const sorted = (grp) =>
+    (members || []).filter((m) => m.grp === grp).sort((a, b) => a.sort_order - b.sort_order);
+
+  const update = (id, k, v) => setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, [k]: v } : m)));
+
+  function addMember(grp) {
+    const id = `new-${Date.now()}-${Math.random()}`;
+    setMembers((ms) => [...ms, { id, grp, name: '', role: '', aff: '', img: '', x: '', linkedin: '', sort_order: sorted(grp).length }]);
+  }
+  const removeMember = (id) => setMembers((ms) => ms.filter((m) => m.id !== id));
+
+  function move(grp, idx, dir) {
+    const list = sorted(grp);
+    const j = idx + dir;
+    if (j < 0 || j >= list.length) return;
+    const a = list[idx], b = list[j];
+    setMembers((ms) => ms.map((m) =>
+      m.id === a.id ? { ...m, sort_order: j } : m.id === b.id ? { ...m, sort_order: idx } : m));
+  }
+
+  async function uploadPhoto(member, file) {
+    if (!file) return;
+    setUploadingId(member.id); setMsg(null);
+    const safe = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-');
+    const path = `roster/${Date.now()}-${safe}`;
+    const { error } = await supabase.storage.from(FIGURES_BUCKET).upload(path, file, { cacheControl: '3600', upsert: false });
+    if (error) { setUploadingId(null); setMsg({ kind: 'err', text: `Upload failed: ${error.message}` }); return; }
+    const { data } = supabase.storage.from(FIGURES_BUCKET).getPublicUrl(path);
+    update(member.id, 'img', data.publicUrl);
+    setUploadingId(null);
+  }
+
+  async function saveGroup(grp) {
+    const list = sorted(grp);
+    if (list.some((m) => !m.name.trim())) { setMsg({ kind: 'err', text: 'Every person needs a name.' }); return; }
+    setSavingGrp(grp); setMsg(null);
+    const rows = list.map((m, i) => ({
+      grp, name: m.name.trim(), role: m.role || '', aff: m.aff || '',
+      img: m.img || '', x: m.x || '', linkedin: m.linkedin || '', sort_order: i,
+    }));
+    // Replace the whole group so order + removals always mirror what you see.
+    const del = await supabase.from('roster_members').delete().eq('grp', grp);
+    if (del.error) { setSavingGrp(null); setMsg({ kind: 'err', text: del.error.message }); return; }
+    if (rows.length) {
+      const ins = await supabase.from('roster_members').insert(rows);
+      if (ins.error) { setSavingGrp(null); setMsg({ kind: 'err', text: ins.error.message }); return; }
+    }
+    setSavingGrp(null);
+    const label = ROSTER_GROUPS.find((g) => g.grp === grp)?.label || grp;
+    setMsg({ kind: 'ok', text: `Saved the ${label} list. A rebuild has started; the home page updates in a minute or two.` });
+    load();
+  }
+
+  if (err) return <div className="st-note err">{err}</div>;
+  if (!members) return <div className="st-card">Loading…</div>;
+
+  return (
+    <div>
+      <p className="st-help" style={{ marginTop: 0 }}>
+        These are the people shown on the home page. Use the arrows to reorder, and remember to Save each list after changes.
+      </p>
+      {msg && <div className={`st-note ${msg.kind}`}>{msg.text}</div>}
+      {ROSTER_GROUPS.map(({ grp, label }) => {
+        const list = sorted(grp);
+        return (
+          <div key={grp} className="st-card">
+            <div className="st-toolbar" style={{ marginBottom: '.6rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.05rem', color: BRAND_BLUE }}>{label}</h2>
+              <span className="st-help">{list.length} people</span>
+              <div className="st-spacer" />
+              <button className="st-btn" onClick={() => addMember(grp)}>+ Add person</button>
+              <button className="st-btn primary" onClick={() => saveGroup(grp)} disabled={savingGrp === grp}>
+                {savingGrp === grp ? 'Saving…' : 'Save list'}
+              </button>
+            </div>
+            {list.map((m, idx) => (
+              <div key={m.id} className="st-member">
+                <div className="st-member-move">
+                  <button className="st-btn" onClick={() => move(grp, idx, -1)} disabled={idx === 0} title="Move up">↑</button>
+                  <button className="st-btn" onClick={() => move(grp, idx, 1)} disabled={idx === list.length - 1} title="Move down">↓</button>
+                </div>
+                <div className="st-member-fields">
+                  <div className="st-row">
+                    <Field label="Name" value={m.name} onChange={(v) => update(m.id, 'name', v)} />
+                    <Field label="Role" value={m.role} onChange={(v) => update(m.id, 'role', v)} placeholder="e.g. Board Member" />
+                  </div>
+                  <Field label="Affiliation" value={m.aff} onChange={(v) => update(m.id, 'aff', v)} placeholder="Institution, Country" />
+                  <div className="st-row">
+                    <Field label="X / Twitter handle" value={m.x} onChange={(v) => update(m.id, 'x', v)} placeholder="(optional)" />
+                    <Field label="LinkedIn slug" value={m.linkedin} onChange={(v) => update(m.id, 'linkedin', v)} placeholder="(optional)" />
+                  </div>
+                  <Field label="Photo path or URL" value={m.img} onChange={(v) => update(m.id, 'img', v)} placeholder="/img/name.jpg (optional)" />
+                  <div className="st-toolbar" style={{ marginTop: '.4rem' }}>
+                    <label className="st-btn blue" style={{ margin: 0 }}>
+                      {uploadingId === m.id ? 'Uploading…' : '＋ Upload photo'}
+                      <input type="file" accept="image/*" style={{ display: 'none' }}
+                        onChange={(e) => uploadPhoto(m, e.target.files?.[0])} disabled={uploadingId === m.id} />
+                    </label>
+                    <div className="st-spacer" />
+                    <button className="st-btn danger" onClick={() => removeMember(m.id)}>Remove</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {list.length === 0 && <div className="st-help">No one in this list yet.</div>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- polls
+const EMPTY_OPTION = { title: '', authors: '', journal: '', date: '', url: '' };
+const EMPTY_POLL = {
+  id: null, month: '', question: 'Which study is most likely to impact neonatal care?',
+  status: 'open', options: [{ ...EMPTY_OPTION }, { ...EMPTY_OPTION }], results: null, body: '',
+};
+
+function PollManager() {
+  const [polls, setPolls] = useState(null);
+  const [err, setErr] = useState('');
+  const [editing, setEditing] = useState(null); // poll row being edited, or null
+  const [msg, setMsg] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  function load() {
+    supabase.from('polls').select('*').order('month', { ascending: false })
+      .then(({ data, error }) => { if (error) setErr(error.message); else setPolls(data || []); });
+  }
+  useEffect(load, []);
+
+  function openNew() { setMsg(null); setEditing({ ...EMPTY_POLL, options: [{ ...EMPTY_OPTION }, { ...EMPTY_OPTION }] }); }
+  function openEdit(p) { setMsg(null); setEditing(JSON.parse(JSON.stringify(p))); }
+
+  const setField = (k, v) => setEditing((e) => ({ ...e, [k]: v }));
+  const setOption = (i, k, v) =>
+    setEditing((e) => ({ ...e, options: e.options.map((o, j) => (j === i ? { ...o, [k]: v } : o)) }));
+  const addOption = () => setEditing((e) => ({ ...e, options: [...e.options, { ...EMPTY_OPTION }] }));
+  const removeLastOption = () =>
+    setEditing((e) => (e.options.length > 2 ? { ...e, options: e.options.slice(0, -1) } : e));
+
+  function setResult(i, v) {
+    setEditing((e) => {
+      const results = { ...(e.results || {}) };
+      if (v === '' || v == null) delete results[String(i)];
+      else results[String(i)] = Number(v);
+      return { ...e, results: Object.keys(results).length ? results : null };
+    });
+  }
+
+  async function save() {
+    const e = editing;
+    if (!/^\d{4}-\d{2}$/.test(e.month)) { setMsg({ kind: 'err', text: 'Month must look like 2026-11.' }); return; }
+    if (e.options.some((o) => !o.title.trim())) { setMsg({ kind: 'err', text: 'Every candidate study needs a title.' }); return; }
+    setBusy(true); setMsg(null);
+    const payload = {
+      month: e.month.trim(), question: e.question || EMPTY_POLL.question, status: e.status,
+      options: e.options.map((o) => ({
+        title: o.title.trim(), authors: o.authors || '', journal: o.journal || '',
+        date: o.date || '', url: o.url || '',
+      })),
+      results: e.status === 'closed' && e.results && Object.keys(e.results).length ? e.results : null,
+      body: e.body || '',
+    };
+    const { error } = await supabase.from('polls').upsert(payload, { onConflict: 'month' });
+    setBusy(false);
+    if (error) {
+      setMsg({ kind: 'err', text: error.code === '23505' ? 'A poll already exists for that month.' : error.message });
+      return;
+    }
+    setMsg({ kind: 'ok', text: 'Poll saved. A rebuild has started; the Vote page updates in a minute or two.' });
+    setEditing(null); load();
+  }
+
+  async function remove(p) {
+    if (!window.confirm(`Delete the ${p.month} poll? This cannot be undone.`)) return;
+    const { error } = await supabase.from('polls').delete().eq('id', p.id);
+    if (error) { setMsg({ kind: 'err', text: error.message }); return; }
+    setMsg({ kind: 'ok', text: `Deleted the ${p.month} poll.` });
+    load();
+  }
+
+  if (err) return <div className="st-note err">{err}</div>;
+  if (!polls) return <div className="st-card">Loading…</div>;
+
+  if (editing) {
+    const e = editing;
+    return (
+      <div>
+        <div className="st-toolbar" style={{ marginBottom: '1rem' }}>
+          <button className="st-btn" onClick={() => setEditing(null)}>← Back to polls</button>
+          <div className="st-spacer" />
+          <button className="st-btn primary" onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save poll'}</button>
+        </div>
+        {msg && <div className={`st-note ${msg.kind}`}>{msg.text}</div>}
+        <div className="st-card">
+          <div className="st-row">
+            <Field label="Ballot month" value={e.month} onChange={(v) => setField('month', v)} placeholder="2026-11"
+              help="This is the ballot's key and sort order. One poll per month." />
+            <div>
+              <label className="st-label">Status</label>
+              <select className="st-select" value={e.status} onChange={(ev) => setField('status', ev.target.value)}>
+                <option value="open">Open (accepting votes)</option>
+                <option value="closed">Closed (archived)</option>
+              </select>
+              <p className="st-help">Only one poll should be open at a time.</p>
+            </div>
+          </div>
+          <Field label="Question" value={e.question} onChange={(v) => setField('question', v)} />
+        </div>
+
+        <div className="st-card">
+          <div className="st-toolbar">
+            <h2 style={{ margin: 0, fontSize: '1.05rem', color: BRAND_BLUE }}>Candidate studies</h2>
+            <div className="st-spacer" />
+            <button className="st-btn" onClick={removeLastOption} disabled={e.options.length <= 2}>Remove last</button>
+            <button className="st-btn" onClick={addOption}>+ Add study</button>
+          </div>
+          <div className="st-note info">
+            The order of studies is permanent once voting opens, each study's position is its vote id.
+            Add or remove from the end before the poll goes live; don't reorder afterwards.
+          </div>
+          {e.options.map((o, i) => (
+            <div key={i} className="st-card" style={{ background: '#f8fafc' }}>
+              <label className="st-label">Study {i + 1}</label>
+              <Field label="Title" value={o.title} onChange={(v) => setOption(i, 'title', v)} />
+              <div className="st-row">
+                <Field label="Authors" value={o.authors} onChange={(v) => setOption(i, 'authors', v)} placeholder="Harris DL, et al." />
+                <Field label="Journal" value={o.journal} onChange={(v) => setOption(i, 'journal', v)} placeholder="N Engl J Med" />
+              </div>
+              <div className="st-row">
+                <Field label="Date / year" value={o.date} onChange={(v) => setOption(i, 'date', v)} placeholder="2026" />
+                <Field label="Link (URL)" value={o.url} onChange={(v) => setOption(i, 'url', v)} placeholder="https://pubmed.ncbi.nlm.nih.gov/…" />
+              </div>
+              {e.status === 'closed' && (
+                <Field label="Final vote count (optional)" type="number"
+                  value={e.results?.[String(i)] ?? ''} onChange={(v) => setResult(i, v)}
+                  help="Set these to freeze the final tally shown on the archived poll." />
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="st-card">
+          <label className="st-label">Intro text (optional)</label>
+          <p className="st-help" style={{ marginTop: 0 }}>Short note shown with the ballot. Plain text.</p>
+          <textarea className="st-textarea" style={{ minHeight: 120 }} value={e.body}
+            onChange={(ev) => setField('body', ev.target.value)} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="st-toolbar" style={{ marginBottom: '1rem' }}>
+        <p className="st-help" style={{ margin: 0 }}>The newest open poll is the live ballot on the Vote page; the rest are archived.</p>
+        <div className="st-spacer" />
+        <button className="st-btn primary" onClick={openNew}>+ New poll</button>
+      </div>
+      {msg && <div className={`st-note ${msg.kind}`}>{msg.text}</div>}
+      <div className="st-card">
+        {polls.map((p) => (
+          <div key={p.id} className="st-list-item">
+            <div onClick={() => openEdit(p)} style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>{p.month} · {p.question}</div>
+              <div className="st-help">{p.options?.length || 0} studies{p.results ? ' · final tally frozen' : ''}</div>
+            </div>
+            <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }}>
+              <span className={`st-badge ${p.status === 'open' ? 'published' : 'draft'}`}>{p.status}</span>
+              <button className="st-btn" onClick={() => openEdit(p)}>Edit</button>
+              <button className="st-btn danger" onClick={() => remove(p)}>Delete</button>
+            </div>
+          </div>
+        ))}
+        {polls.length === 0 && <div className="st-help">No polls yet. Create the first ballot.</div>}
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------- root
 export default function StudioApp() {
   const [session, setSession] = useState(undefined); // undefined=loading
   const [editor, setEditor] = useState(undefined);   // undefined=unknown, null=not-editor, {role}
+  const [tab, setTab] = useState('commentaries');    // commentaries | rosters | polls
   const [view, setView] = useState({ name: 'list' });
 
   useEffect(() => {
@@ -479,16 +804,34 @@ export default function StudioApp() {
         </div>
       </header>
       <main className="st-main">
-        {view.name === 'list' && (
+        <div className="st-tabs">
+          {[
+            { id: 'commentaries', label: 'Commentaries' },
+            { id: 'rosters', label: 'Board & Founders' },
+            { id: 'polls', label: 'Polls' },
+          ].map((t) => (
+            <button
+              key={t.id}
+              className={`st-tab ${tab === t.id ? 'active' : ''}`}
+              onClick={() => { setTab(t.id); setView({ name: 'list' }); }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'commentaries' && view.name === 'list' && (
           <CommentaryList
             role={editor.role}
             onOpen={(id) => setView({ name: 'edit', id })}
             onNew={() => setView({ name: 'edit', id: null })}
           />
         )}
-        {view.name === 'edit' && (
+        {tab === 'commentaries' && view.name === 'edit' && (
           <Editor id={view.id} userId={session.user.id} onBack={() => setView({ name: 'list' })} />
         )}
+        {tab === 'rosters' && <RosterManager />}
+        {tab === 'polls' && <PollManager />}
       </main>
     </div>
   );
