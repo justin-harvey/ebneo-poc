@@ -81,7 +81,8 @@ a.st-link{color:${BRAND_BLUE}}
 .st-tab:hover{color:#1a2b3c}
 .st-tab.active{color:${BRAND_BLUE};border-bottom-color:${BRAND_BLUE}}
 .st-member{display:flex;gap:.6rem;padding:.8rem 0;border-top:1px solid #eef2f5}
-.st-member-move{display:flex;flex-direction:column;gap:.3rem}
+.st-member-move{display:flex;flex-direction:column;gap:.3rem;align-items:center}
+.st-pos{font-size:.75rem;font-weight:700;color:#8795a2}
 .st-member-fields{flex:1}
 `;
 
@@ -522,9 +523,15 @@ function RosterManager() {
 
   return (
     <div>
-      <p className="st-help" style={{ marginTop: 0 }}>
-        These are the people shown on the home page. Use the arrows to reorder, and remember to Save each list after changes.
-      </p>
+      <div className="st-note info" style={{ marginTop: 0 }}>
+        <b>These are the people shown on the home page.</b> There are two separate lists below, each
+        with its own <b>Save</b> button.
+        <ol style={{ margin: '.4rem 0 0', paddingLeft: '1.2rem' }}>
+          <li>Edit a person's details, or use <b>+ Add person</b> / <b>Remove</b>.</li>
+          <li>Reorder with the <b>↑ / ↓</b> buttons on the left of each person (the <b>#</b> shows their position).</li>
+          <li>Click that list's <b>Save</b> button. Each list saves on its own, so save whichever one you changed.</li>
+        </ol>
+      </div>
       {msg && <div className={`st-note ${msg.kind}`}>{msg.text}</div>}
       {ROSTER_GROUPS.map(({ grp, label }) => {
         const list = sorted(grp);
@@ -535,14 +542,16 @@ function RosterManager() {
               <span className="st-help">{list.length} people</span>
               <div className="st-spacer" />
               <button className="st-btn" onClick={() => addMember(grp)}>+ Add person</button>
-              <button className="st-btn primary" onClick={() => saveGroup(grp)} disabled={savingGrp === grp}>
-                {savingGrp === grp ? 'Saving…' : 'Save list'}
+              <button className="st-btn primary" onClick={() => saveGroup(grp)} disabled={savingGrp === grp}
+                title={`Save only the ${label} list`}>
+                {savingGrp === grp ? 'Saving…' : `Save ${label}`}
               </button>
             </div>
             {list.map((m, idx) => (
               <div key={m.id} className="st-member">
                 <div className="st-member-move">
                   <button className="st-btn" onClick={() => move(grp, idx, -1)} disabled={idx === 0} title="Move up">↑</button>
+                  <span className="st-pos" title="Position in this list">#{idx + 1}</span>
                   <button className="st-btn" onClick={() => move(grp, idx, 1)} disabled={idx === list.length - 1} title="Move down">↓</button>
                 </div>
                 <div className="st-member-fields">
@@ -629,10 +638,14 @@ function PollManager() {
       results: e.status === 'closed' && e.results && Object.keys(e.results).length ? e.results : null,
       body: e.body || '',
     };
-    const { error } = await supabase.from('polls').upsert(payload, { onConflict: 'month' });
+    // New poll => insert (a duplicate month errors instead of silently
+    // overwriting an existing ballot). Existing poll => update by id.
+    const { error } = e.id
+      ? await supabase.from('polls').update(payload).eq('id', e.id)
+      : await supabase.from('polls').insert(payload);
     setBusy(false);
     if (error) {
-      setMsg({ kind: 'err', text: error.code === '23505' ? 'A poll already exists for that month.' : error.message });
+      setMsg({ kind: 'err', text: error.code === '23505' ? 'A poll already exists for that month. Open it from the list to edit it.' : error.message });
       return;
     }
     setMsg({ kind: 'ok', text: 'Poll saved. A rebuild has started; the Vote page updates in a minute or two.' });
