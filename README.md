@@ -12,7 +12,7 @@ CMS and published automatically.
 - Editor admin ("Studio"): **https://ebneo-poc.netlify.app/studio** (invite-only; sign in with a
   magic link sent to an approved email, there is no public sign-up).
 
-## ✨ A custom headless CMS
+## A custom headless CMS
 
 Off-the-shelf Git-based editors didn't fit, non-technical doctors won't manage GitHub, so EBNEO runs
 its own lightweight CMS built on Supabase:
