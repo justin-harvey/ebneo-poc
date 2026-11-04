@@ -98,6 +98,8 @@ a.st-link{color:${BRAND_BLUE}}
 .st-tour-foot{display:flex;align-items:center;gap:.5rem}
 .st-tour-step{font-size:.76rem;color:#8795a2;font-weight:600}
 .st-tour-x{position:absolute;top:.5rem;right:.6rem;border:0;background:transparent;font-size:1.1rem;line-height:1;color:#8795a2;cursor:pointer}
+.st-pagehelp{display:inline-flex;align-items:center;gap:.4rem;align-self:center;margin-bottom:.3rem;border:0;background:transparent;color:${BRAND_BLUE};font-size:.82rem;font-weight:600;cursor:pointer}
+.st-pagehelp:hover{text-decoration:underline}
 `;
 
 function Styles() {
@@ -825,7 +827,12 @@ const TOUR_STEPS = [
   },
   {
     tab: 'polls', target: '[data-tour="new-poll"]',
-    title: 'The monthly poll — always a future month',
+    title: 'The monthly poll',
+    body: 'The Polls tab lists every ballot. The newest “Open” poll is the live vote on the public site; older ones are “Closed” and archived. Only one poll should be open at a time.',
+  },
+  {
+    tab: 'polls', target: '[data-tour="new-poll"]',
+    title: 'Always set up a future month',
     body: 'Polls run one month at a time. To set up a ballot, click “+ New poll” and choose a FUTURE month (e.g. 2026-12). Never reuse the month that is currently live — always pick the next one, so you don’t disturb the open ballot people are voting in.',
   },
   {
@@ -835,10 +842,10 @@ const TOUR_STEPS = [
   },
 ];
 
-function Tour({ step, onNext, onPrev, onClose, goTo }) {
-  const s = TOUR_STEPS[step];
+function Tour({ steps, step, onNext, onPrev, onClose, goTo }) {
+  const s = steps[step];
   const [rect, setRect] = useState(null);
-  const last = step === TOUR_STEPS.length - 1;
+  const last = step === steps.length - 1;
 
   useEffect(() => {
     if (s.tab) goTo(s.tab);
@@ -898,7 +905,7 @@ function Tour({ step, onNext, onPrev, onClose, goTo }) {
         <h3>{s.title}</h3>
         <p>{s.body}</p>
         <div className="st-tour-foot">
-          <span className="st-tour-step">Step {step + 1} of {TOUR_STEPS.length}</span>
+          <span className="st-tour-step">Step {step + 1} of {steps.length}</span>
           <div className="st-spacer" />
           {step > 0 && <button className="st-btn" onClick={onPrev}>Back</button>}
           {last
@@ -916,11 +923,17 @@ export default function StudioApp() {
   const [editor, setEditor] = useState(undefined);   // undefined=unknown, null=not-editor, {role}
   const [tab, setTab] = useState('commentaries');    // commentaries | rosters | polls
   const [view, setView] = useState({ name: 'list' });
-  const [tour, setTour] = useState(null);            // null=closed, else step index
+  const [tour, setTour] = useState(null);            // null=closed, else { steps, i }
 
   // Tour navigation: jump to a tab and reset to its list so anchored elements exist.
   function goTo(t) { setTab(t); setView({ name: 'list' }); }
-  function startTour() { goTo('commentaries'); setTour(0); }
+  // Full walkthrough (header "Guide" button + first-run): every step.
+  function startTour() { goTo('commentaries'); setTour({ steps: TOUR_STEPS, i: 0 }); }
+  // Contextual help: only the steps for the tab you're on right now.
+  function startPageTour() {
+    const steps = TOUR_STEPS.filter((s) => s.tab === tab);
+    if (steps.length) setTour({ steps, i: 0 });
+  }
   function endTour() { setTour(null); try { localStorage.setItem(TOUR_KEY, '1'); } catch {} }
 
   useEffect(() => {
@@ -941,7 +954,7 @@ export default function StudioApp() {
     if (!editor) return;
     let done = false;
     try { done = localStorage.getItem(TOUR_KEY) === '1'; } catch {}
-    if (!done) setTour(0);
+    if (!done) setTour({ steps: TOUR_STEPS, i: 0 });
   }, [editor]);
 
   if (!supabaseConfigured) {
@@ -997,6 +1010,15 @@ export default function StudioApp() {
               {t.label}<Info text={t.tip} tabIndex={-1} />
             </button>
           ))}
+          <div className="st-spacer" />
+          <button
+            className="st-pagehelp"
+            onClick={startPageTour}
+            title="Walk me through this page"
+          >
+            <span className="st-info" aria-hidden="true" style={{ marginLeft: 0 }}>?</span>
+            How this page works
+          </button>
         </div>
 
         {tab === 'commentaries' && view.name === 'list' && (
@@ -1012,12 +1034,13 @@ export default function StudioApp() {
         {tab === 'rosters' && <RosterManager />}
         {tab === 'polls' && <PollManager />}
       </main>
-      {tour !== null && (
+      {tour && (
         <Tour
-          step={tour}
+          steps={tour.steps}
+          step={tour.i}
           goTo={goTo}
-          onNext={() => setTour((n) => Math.min(n + 1, TOUR_STEPS.length - 1))}
-          onPrev={() => setTour((n) => Math.max(n - 1, 0))}
+          onNext={() => setTour((t) => ({ ...t, i: Math.min(t.i + 1, t.steps.length - 1) }))}
+          onPrev={() => setTour((t) => ({ ...t, i: Math.max(t.i - 1, 0) }))}
           onClose={endTour}
         />
       )}
