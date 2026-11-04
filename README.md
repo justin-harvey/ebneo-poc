@@ -4,7 +4,7 @@ Evidence-Based Neonatology, the EBNEO website. A static site whose commentaries,
 rosters, and monthly journal-club polls are authored by clinicians through a custom, purpose-built
 CMS and published automatically.
 
-## 🔗 Live site
+## Live site
 
 **https://ebneo-poc.netlify.app**
 
