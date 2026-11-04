@@ -84,10 +84,35 @@ a.st-link{color:${BRAND_BLUE}}
 .st-member-move{display:flex;flex-direction:column;gap:.3rem;align-items:center}
 .st-pos{font-size:.75rem;font-weight:700;color:#8795a2}
 .st-member-fields{flex:1}
+.st-info{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:.3rem;border-radius:50%;background:#c3d2de;color:#2b4a63;font-size:.7rem;font-weight:700;cursor:help;position:relative;vertical-align:middle;line-height:1}
+.st-info:hover,.st-info:focus{background:${BRAND_BLUE};color:#fff;outline:none}
+.st-info .st-tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:230px;background:#0b2239;color:#fff;font-size:.74rem;font-weight:400;line-height:1.35;text-transform:none;letter-spacing:normal;padding:.5rem .6rem;border-radius:7px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.25);text-align:left}
+.st-info:hover .st-tip,.st-info:focus .st-tip,.st-tab:focus-within .st-tip{display:block}
+.st-info .st-tip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#0b2239}
+.st-tour-backdrop{position:fixed;inset:0;background:rgba(6,18,30,.55);z-index:1000}
+.st-tour-ring{position:fixed;border:3px solid ${BRAND_GREEN};border-radius:10px;box-shadow:0 0 0 4px rgba(112,176,48,.35);z-index:1001;pointer-events:none;transition:all .18s ease}
+.st-tour-card{position:fixed;z-index:1002;background:#fff;border-radius:12px;padding:1.1rem 1.2rem;box-shadow:0 18px 50px rgba(0,0,0,.35);width:340px;max-width:92vw}
+.st-tour-card.center{top:50%;left:50%;transform:translate(-50%,-50%);width:400px}
+.st-tour-card h3{margin:0 0 .4rem;color:${BRAND_BLUE};font-size:1.08rem}
+.st-tour-card p{margin:0 0 .9rem;font-size:.9rem;line-height:1.5;color:#2b3b4b}
+.st-tour-foot{display:flex;align-items:center;gap:.5rem}
+.st-tour-step{font-size:.76rem;color:#8795a2;font-weight:600}
+.st-tour-x{position:absolute;top:.5rem;right:.6rem;border:0;background:transparent;font-size:1.1rem;line-height:1;color:#8795a2;cursor:pointer}
 `;
 
 function Styles() {
   return <style dangerouslySetInnerHTML={{ __html: css }} />;
+}
+
+// A small "?" badge with a hover/focus tooltip. Dependency-free; used inline next
+// to tab labels and non-obvious fields. tabIndex=-1 when nested inside another
+// focusable control (the tabs), so it doesn't add a second tab stop.
+function Info({ text, tabIndex = 0 }) {
+  return (
+    <span className="st-info" tabIndex={tabIndex} role="img" aria-label={`Help: ${text}`}>
+      ?<span className="st-tip">{text}</span>
+    </span>
+  );
 }
 
 // ---------------------------------------------------------------- login
@@ -192,10 +217,10 @@ function CommentaryList({ onOpen, onNew, role }) {
           value={q} onChange={(e) => setQ(e.target.value)}
         />
         <div className="st-spacer" />
-        <button className="st-btn" onClick={deployNow} disabled={deploying} title="Rebuild the live site now">
+        <button className="st-btn" data-tour="deploy" onClick={deployNow} disabled={deploying} title="Rebuild the live site now">
           {deploying ? 'Starting…' : '↻ Deploy site now'}
         </button>
-        <button className="st-btn primary" onClick={onNew}>+ New commentary</button>
+        <button className="st-btn primary" data-tour="new-commentary" onClick={onNew}>+ New commentary</button>
       </div>
       {deployMsg && <div className={`st-note ${deployMsg.kind}`}>{deployMsg.text}</div>}
       {err && <div className="st-note err">{err}</div>}
@@ -356,7 +381,7 @@ function Editor({ id, userId, onBack }) {
             <label className="st-label">Title</label>
             <input className="st-input" value={row.title} onChange={(e) => onTitle(e.target.value)} />
 
-            <label className="st-label">Web address (slug)</label>
+            <label className="st-label">Web address (slug)<Info text="The end of the page’s web address, e.g. ebneo.org/your-slug/. It’s filled in from the title automatically. Use only lowercase letters, numbers and hyphens. Changing it later changes the page’s link." /></label>
             <input
               className="st-input" value={row.slug}
               onChange={(e) => { setSlugTouched(true); set('slug', e.target.value); }}
@@ -395,6 +420,7 @@ function Editor({ id, userId, onBack }) {
             <label className="st-label" style={{ marginTop: '.8rem' }}>
               <input type="checkbox" checked={row.needs_review} onChange={(e) => set('needs_review', e.target.checked)} style={{ marginRight: '.4rem' }} />
               Flag as “needs review”
+              <Info text="A private note to your team that this commentary still needs a second look. It shows a “review” badge in this list but has no effect on the public site." />
             </label>
           </div>
 
@@ -431,10 +457,10 @@ function Editor({ id, userId, onBack }) {
 }
 
 // ---------------------------------------------------------------- shared field
-function Field({ label, value, onChange, type = 'text', placeholder, list, help }) {
+function Field({ label, value, onChange, type = 'text', placeholder, list, help, info }) {
   return (
     <>
-      <label className="st-label">{label}</label>
+      <label className="st-label">{label}{info && <Info text={info} />}</label>
       <input
         className="st-input" type={type} list={list} value={value ?? ''}
         placeholder={placeholder} onChange={(e) => onChange(e.target.value)}
@@ -523,7 +549,7 @@ function RosterManager() {
 
   return (
     <div>
-      <div className="st-note info" style={{ marginTop: 0 }}>
+      <div className="st-note info" style={{ marginTop: 0 }} data-tour="roster">
         <b>These are the people shown on the home page.</b> There are two separate lists below, each
         with its own <b>Save</b> button.
         <ol style={{ margin: '.4rem 0 0', paddingLeft: '1.2rem' }}>
@@ -676,9 +702,10 @@ function PollManager() {
         <div className="st-card">
           <div className="st-row">
             <Field label="Ballot month" value={e.month} onChange={(v) => setField('month', v)} placeholder="2026-11"
-              help="This is the ballot's key and sort order. One poll per month." />
+              help="This is the ballot's key and sort order. One poll per month."
+              info="Format YYYY-MM. Always use a FUTURE month when creating a new poll — never reuse the month that is currently live, or you’ll disturb the open ballot." />
             <div>
-              <label className="st-label">Status</label>
+              <label className="st-label">Status<Info text="Only one poll should be “Open” at a time — that’s the live ballot on the Vote page. Set older ones to “Closed” to archive them." /></label>
               <select className="st-select" value={e.status} onChange={(ev) => setField('status', ev.target.value)}>
                 <option value="open">Open (accepting votes)</option>
                 <option value="closed">Closed (archived)</option>
@@ -736,7 +763,7 @@ function PollManager() {
       <div className="st-toolbar" style={{ marginBottom: '1rem' }}>
         <p className="st-help" style={{ margin: 0 }}>The newest open poll is the live ballot on the Vote page; the rest are archived.</p>
         <div className="st-spacer" />
-        <button className="st-btn primary" onClick={openNew}>+ New poll</button>
+        <button className="st-btn primary" data-tour="new-poll" onClick={openNew}>+ New poll</button>
       </div>
       {msg && <div className={`st-note ${msg.kind}`}>{msg.text}</div>}
       <div className="st-card">
@@ -759,12 +786,142 @@ function PollManager() {
   );
 }
 
+// ---------------------------------------------------------------- guided tour
+const TOUR_KEY = 'ebneo_studio_tour_done_v1';
+
+// Each step can set the tab it belongs to and (optionally) anchor to an element
+// by CSS selector. Steps without a target are shown centered. Plain language —
+// the editors are clinicians, not technical users.
+const TOUR_STEPS = [
+  {
+    center: true,
+    title: 'Welcome to EBNEO Studio',
+    body: 'This is your private editing area. You got in with a one-time sign-in link sent to your email — no password to remember. Let’s take 30 seconds to walk through the three things you’ll do here. You can close this anytime and reopen it from the “Guide” button at the top right.',
+  },
+  {
+    tab: 'commentaries', target: '[data-tour="tabs"]',
+    title: 'Three sections',
+    body: 'Everything lives under these three tabs: Commentaries (the article summaries), Board & Founders (the people shown on the home page), and Polls (the monthly vote).',
+  },
+  {
+    tab: 'commentaries', target: '[data-tour="new-commentary"]',
+    title: 'Write a commentary',
+    body: 'Click “+ New commentary” to start one. You’ll get the nine standard sections already laid out — just fill them in and upload any figures. Use “Save draft” while you work; drafts stay hidden from the public.',
+  },
+  {
+    tab: 'commentaries', target: '[data-tour="deploy"]',
+    title: 'Publishing goes live on its own',
+    body: 'When a commentary is ready, open it and click “Publish”. The live site rebuilds automatically and your page appears in a minute or two — you don’t touch any code. If you ever want to force a refresh, “↻ Deploy site now” does it.',
+  },
+  {
+    tab: 'rosters', target: '[data-tour="roster"]',
+    title: 'Two separate people lists',
+    body: 'Board & Founders holds two independent lists — Executive Board and Founders & Past Chairs. Each list has its OWN Save button. Saving one list does not touch the other, so after you edit a list, save that same list.',
+  },
+  {
+    tab: 'rosters', target: '[data-tour="roster"]',
+    title: 'Reordering people',
+    body: 'Use the ↑ / ↓ buttons to the left of each person to change the order; the # shows their position in the list. When you’re happy, click that list’s Save button to make it stick.',
+  },
+  {
+    tab: 'polls', target: '[data-tour="new-poll"]',
+    title: 'The monthly poll — always a future month',
+    body: 'Polls run one month at a time. To set up a ballot, click “+ New poll” and choose a FUTURE month (e.g. 2026-12). Never reuse the month that is currently live — always pick the next one, so you don’t disturb the open ballot people are voting in.',
+  },
+  {
+    center: true,
+    title: 'You’re all set',
+    body: 'That’s the tour. Watch for the small “?” icons beside fields for quick hints, and reopen this walkthrough anytime from the “Guide” button. Happy editing!',
+  },
+];
+
+function Tour({ step, onNext, onPrev, onClose, goTo }) {
+  const s = TOUR_STEPS[step];
+  const [rect, setRect] = useState(null);
+  const last = step === TOUR_STEPS.length - 1;
+
+  useEffect(() => {
+    if (s.tab) goTo(s.tab);
+    setRect(null);
+    if (s.center || !s.target) return;
+    // The target may not exist yet (tab just switched, data still loading).
+    // Poll a few animation frames before giving up and showing a centered card.
+    let raf, tries = 0;
+    const find = () => {
+      const el = document.querySelector(s.target);
+      if (el) {
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        setRect(el.getBoundingClientRect());
+      } else if (tries++ < 30) {
+        raf = requestAnimationFrame(find);
+      }
+    };
+    raf = requestAnimationFrame(find);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  useEffect(() => {
+    function reflow() {
+      if (s.center || !s.target) return;
+      const el = document.querySelector(s.target);
+      if (el) setRect(el.getBoundingClientRect());
+    }
+    window.addEventListener('resize', reflow);
+    return () => window.removeEventListener('resize', reflow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
+  const centered = s.center || !rect;
+  let cardStyle = {};
+  if (!centered) {
+    const below = rect.bottom + 320 < window.innerHeight;
+    const top = below ? rect.bottom + 12 : Math.max(12, rect.top - 300);
+    const left = Math.min(Math.max(rect.left, 12), window.innerWidth - 352);
+    cardStyle = { top, left };
+  }
+
+  return (
+    <div className="st-tour-backdrop" onClick={onClose}>
+      {!centered && (
+        <div className="st-tour-ring" style={{
+          top: rect.top - 6, left: rect.left - 6,
+          width: rect.width + 12, height: rect.height + 12,
+        }} />
+      )}
+      <div
+        className={`st-tour-card${centered ? ' center' : ''}`}
+        style={cardStyle}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="st-tour-x" onClick={onClose} aria-label="Close the guide">×</button>
+        <h3>{s.title}</h3>
+        <p>{s.body}</p>
+        <div className="st-tour-foot">
+          <span className="st-tour-step">Step {step + 1} of {TOUR_STEPS.length}</span>
+          <div className="st-spacer" />
+          {step > 0 && <button className="st-btn" onClick={onPrev}>Back</button>}
+          {last
+            ? <button className="st-btn primary" onClick={onClose}>Done</button>
+            : <button className="st-btn primary" onClick={onNext}>Next</button>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------- root
 export default function StudioApp() {
   const [session, setSession] = useState(undefined); // undefined=loading
   const [editor, setEditor] = useState(undefined);   // undefined=unknown, null=not-editor, {role}
   const [tab, setTab] = useState('commentaries');    // commentaries | rosters | polls
   const [view, setView] = useState({ name: 'list' });
+  const [tour, setTour] = useState(null);            // null=closed, else step index
+
+  // Tour navigation: jump to a tab and reset to its list so anchored elements exist.
+  function goTo(t) { setTab(t); setView({ name: 'list' }); }
+  function startTour() { goTo('commentaries'); setTour(0); }
+  function endTour() { setTour(null); try { localStorage.setItem(TOUR_KEY, '1'); } catch {} }
 
   useEffect(() => {
     if (!supabaseConfigured) { setSession(null); return; }
@@ -778,6 +935,14 @@ export default function StudioApp() {
     supabase.from('editors').select('role').eq('id', session.user.id).maybeSingle()
       .then(({ data }) => setEditor(data || null));
   }, [session]);
+
+  // Show the walkthrough automatically the first time a real editor signs in.
+  useEffect(() => {
+    if (!editor) return;
+    let done = false;
+    try { done = localStorage.getItem(TOUR_KEY) === '1'; } catch {}
+    if (!done) setTour(0);
+  }, [editor]);
 
   if (!supabaseConfigured) {
     return (
@@ -813,22 +978,23 @@ export default function StudioApp() {
         <h1>EBNEO Studio</h1>
         <div className="who">
           <span>{session.user.email}{editor.role === 'admin' ? ' · admin' : ''}</span>
+          <button className="st-btn ghost" onClick={startTour} title="Replay the guided walkthrough">❔ Guide</button>
           <button className="st-btn ghost" onClick={() => supabase.auth.signOut()}>Sign out</button>
         </div>
       </header>
       <main className="st-main">
-        <div className="st-tabs">
+        <div className="st-tabs" data-tour="tabs">
           {[
-            { id: 'commentaries', label: 'Commentaries' },
-            { id: 'rosters', label: 'Board & Founders' },
-            { id: 'polls', label: 'Polls' },
+            { id: 'commentaries', label: 'Commentaries', tip: 'The article summaries. Create, edit, and publish commentaries here.' },
+            { id: 'rosters', label: 'Board & Founders', tip: 'The two lists of people shown on the home page. Each list saves on its own.' },
+            { id: 'polls', label: 'Polls', tip: 'The monthly study vote. One ballot per month; set up the next month ahead of time.' },
           ].map((t) => (
             <button
               key={t.id}
               className={`st-tab ${tab === t.id ? 'active' : ''}`}
               onClick={() => { setTab(t.id); setView({ name: 'list' }); }}
             >
-              {t.label}
+              {t.label}<Info text={t.tip} tabIndex={-1} />
             </button>
           ))}
         </div>
@@ -846,6 +1012,15 @@ export default function StudioApp() {
         {tab === 'rosters' && <RosterManager />}
         {tab === 'polls' && <PollManager />}
       </main>
+      {tour !== null && (
+        <Tour
+          step={tour}
+          goTo={goTo}
+          onNext={() => setTour((n) => Math.min(n + 1, TOUR_STEPS.length - 1))}
+          onPrev={() => setTour((n) => Math.max(n - 1, 0))}
+          onClose={endTour}
+        />
+      )}
     </div>
   );
 }
