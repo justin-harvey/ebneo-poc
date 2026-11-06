@@ -1,0 +1,35 @@
+name: Supabase keep-alive
+
+# Free-tier Supabase projects pause after 7 days of no activity. This pings the
+# project's REST API on a schedule so the DB stays awake during the pre-launch
+# QA window. See EBNEO-OUTSTANDING-PRIORITIES.md — once we move to Supabase Pro
+# (which removes pausing and gives us the PITR backups we need anyway) this
+# workflow can be deleted.
+
+on:
+  schedule:
+    - cron: "0 12 */3 * *"   # every 3 days at 12:00 UTC — two misses of slack before the 7-day pause
+  workflow_dispatch: {}       # allow a manual run from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Touch the database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          # A trivial read reaches PostgREST and counts as project activity.
+          # RLS may filter the result to an empty set — that is fine; the point
+          # is that the request reaches the project. We only fail on a network
+          # error, not on the HTTP status.
+          code=$(curl -sS -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/commentaries?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "Supabase responded HTTP $code"
+          if [ -z "$code" ]; then
+            echo "No HTTP response — project unreachable." >&2
+            exit 1
+          fi
