@@ -72,6 +72,17 @@ body{margin:0}
 .st-note.err{background:#fdeaea;color:#a11;border:1px solid #f3c9c9}
 .st-note.ok{background:#e9f6df;color:#3d6b17;border:1px solid #c7e7ac}
 .st-note.info{background:#e7f0f8;color:#235a86;border:1px solid #c3dbef}
+.st-health{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:.5rem 1.2rem;font-size:.82rem;border-bottom:1px solid #c7e7ac;background:#eef6e4;color:#3d6b17}
+.st-health.down{background:#fdeaea;color:#a11;border-bottom-color:#f3c9c9}
+.st-health.warn{background:#fdf3d8;color:#8a6100;border-bottom-color:#f0e0b0}
+.st-health.checking{background:#eef2f5;color:#50606f;border-bottom-color:#e2e8ee}
+.st-health .dot{width:10px;height:10px;border-radius:50%;flex:none;background:currentColor;box-shadow:0 0 0 3px rgba(0,0,0,.07)}
+.st-health.checking .dot{animation:st-pulse 1s ease-in-out infinite}
+@keyframes st-pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.st-health .lbl{font-weight:700}
+.st-health .meta{opacity:.82}
+.st-health .actions{margin-left:auto;display:flex;align-items:center;gap:.6rem}
+.st-health .st-btn{padding:.35rem .75rem;font-size:.8rem}
 .st-center{max-width:440px;margin:7vh auto;padding:0 1rem}
 .st-toolbar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
 .st-spacer{flex:1}
@@ -114,6 +125,102 @@ function Info({ text, tabIndex = 0 }) {
     <span className="st-info" tabIndex={tabIndex} role="img" aria-label={`Help: ${text}`}>
       ?<span className="st-tip">{text}</span>
     </span>
+  );
+}
+
+// ------------------------------------------------------------ db health bar
+// EBNEO's data lives in a free-tier Supabase project, which pauses after 7 days
+// with no activity. This bar does a cheap read to confirm the DB is awake, polls
+// while Studio is open, and gives non-technical editors a one-click "Ping now"
+// to wake/keep it alive before the pause window closes. (A GitHub Actions cron
+// also pings every 3 days — see .github/workflows/supabase-keepalive.yml — this
+// bar is the in-app, human-visible backstop.) No data is changed by a ping.
+const DB_LAST_OK_KEY = 'ebneo_db_last_ok_v1';
+const DB_POLL_MS = 60000;   // re-check once a minute while Studio is open
+const DB_WARN_DAYS = 5;     // free tier pauses at 7 days idle; nudge before then
+
+function agoLabel(ts) {
+  if (!ts) return 'never';
+  const s = Math.round((Date.now() - ts) / 1000);
+  if (s < 60) return `${s}s ago`;
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} h ago`;
+  const d = Math.round(h / 24);
+  return `${d} day${d === 1 ? '' : 's'} ago`;
+}
+
+function DbHealth() {
+  const [status, setStatus] = useState('checking'); // checking | up | down
+  const [latency, setLatency] = useState(null);
+  const [checkedAt, setCheckedAt] = useState(null);
+  const [lastOk, setLastOk] = useState(() => {
+    try { return Number(localStorage.getItem(DB_LAST_OK_KEY)) || null; } catch { return null; }
+  });
+  const [, force] = useState(0); // tick so the "x ago" labels stay fresh
+
+  async function ping() {
+    setStatus('checking');
+    const t0 = performance.now();
+    // HEAD + count: reaches the DB without transferring rows. Editors can read
+    // commentaries (same table the list view uses), so this is always authorized.
+    const { error } = await supabase
+      .from('commentaries')
+      .select('id', { head: true, count: 'exact' })
+      .limit(1);
+    setLatency(Math.round(performance.now() - t0));
+    setCheckedAt(Date.now());
+    if (error) {
+      setStatus('down');
+    } else {
+      const now = Date.now();
+      setStatus('up');
+      setLastOk(now);
+      try { localStorage.setItem(DB_LAST_OK_KEY, String(now)); } catch {}
+    }
+  }
+
+  useEffect(() => {
+    ping();
+    const poll = setInterval(ping, DB_POLL_MS);
+    const tick = setInterval(() => force((n) => n + 1), 15000);
+    const onVis = () => { if (!document.hidden) ping(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => { clearInterval(poll); clearInterval(tick); document.removeEventListener('visibilitychange', onVis); };
+  }, []);
+
+  const daysIdle = lastOk ? (Date.now() - lastOk) / 86400000 : null;
+  const stale = status !== 'down' && daysIdle != null && daysIdle >= DB_WARN_DAYS;
+  const cls = status === 'down' ? 'down' : stale ? 'warn' : status === 'checking' ? 'checking' : '';
+
+  let label, detail;
+  if (status === 'checking' && latency == null) {
+    label = 'Checking database…'; detail = '';
+  } else if (status === 'down') {
+    label = 'Database unreachable';
+    detail = 'The free-tier database may be paused or offline. Click “Ping now” — it can take ~30s to wake. If it stays red, contact your administrator.';
+  } else if (stale) {
+    label = 'Database healthy — but idle';
+    detail = `Last confirmed ${agoLabel(lastOk)}. The free plan sleeps after 7 days unused; click “Ping now” to keep it awake.`;
+  } else {
+    label = 'Database healthy';
+    detail = `Responded in ${latency} ms.`;
+  }
+
+  return (
+    <div className={`st-health ${cls}`} role="status" aria-live="polite">
+      <span className="dot" aria-hidden="true" />
+      <span className="lbl">{label}</span>
+      {detail && <span className="meta">{detail}</span>}
+      <Info text="EBNEO’s data lives in a free database that goes to sleep after 7 days with no activity. This bar checks that it’s awake. If it turns red or says “idle,” click “Ping now” to wake it — nothing is changed." />
+      <span className="actions">
+        {checkedAt && <span className="meta">checked {agoLabel(checkedAt)}</span>}
+        <button className="st-btn" onClick={ping} disabled={status === 'checking'}>
+          {status === 'checking' ? 'Pinging…' : 'Ping now'}
+        </button>
+      </span>
+    </div>
   );
 }
 
@@ -995,6 +1102,7 @@ export default function StudioApp() {
           <button className="st-btn ghost" onClick={() => supabase.auth.signOut()}>Sign out</button>
         </div>
       </header>
+      <DbHealth />
       <main className="st-main">
         <div className="st-tabs" data-tour="tabs">
           {[
