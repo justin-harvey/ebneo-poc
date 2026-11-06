@@ -28,6 +28,27 @@ its own lightweight CMS built on Supabase:
   lists, and the monthly polls are all edited in the same React app.
 - **Publish means publish.** Saving a published change fires a Netlify build hook that rebuilds and
   redeploys the static site automatically.
+- **Built for clinicians, not engineers.** Studio opens with a dismissible guided walkthrough on an
+  editor's first sign-in (replayable from the **Guide** button), inline `?` tooltips on the
+  non-obvious fields, and plain-language help throughout, no Git or Markdown knowledge required.
+
+## Database availability
+
+The published website is fully static and never touches a database at request time, so the public
+site stays up regardless. The **Supabase** project only matters for editing in Studio and for live
+vote tallies. On the free plan a Supabase project **pauses after 7 days with no activity**, so two
+layers keep it awake:
+
+- **Automated keep-alive.** A scheduled GitHub Action
+  (`.github/workflows/supabase-keepalive.yml`) pings the database every 3 days, well inside the
+  7-day window. It needs two repo secrets, `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+- **In-app health bar.** A status strip under the Studio header shows at a glance whether the
+  database is awake, green when healthy (with response time), amber once it has been idle 5+ days,
+  red if it is unreachable. A **Ping now** button lets an editor wake it on demand. A ping only
+  reads, it never changes data.
+
+> On a production (non-free) Supabase plan, project pausing goes away entirely; at that point both
+> the workflow and the health bar's warnings become unnecessary and the workflow can be deleted.
 
 ## Tech stack
 
