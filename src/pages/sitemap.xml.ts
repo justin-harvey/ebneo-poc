@@ -10,6 +10,7 @@ export async function GET(context: APIContext) {
   const staticPaths = [
     '/',
     '/about/',
+    '/team/',
     '/reviews/',
     '/vote/',
     '/impact/',

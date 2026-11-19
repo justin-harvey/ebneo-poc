@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PersonCard from '../components/PersonCard.astro';
+import board from '../data/board.json';
+import founders from '../data/founders.json';
+// Dedicated people page: the Executive Board + Founders rosters, moved off the landing page
+// (wish-list M20) so the home page leads with the mission and content, not a long roster.
+---
+<Base title="Our Team"
+      description="The Executive Board, editors, and founders of the International Society for Evidence-Based Neonatology (EBNEO).">
+  <section class="panel">
+    <div class="hero">
+      <svg class="pulse" viewBox="0 0 240 60" fill="none" aria-hidden="true">
+        <path d="M0 40 H60 L72 40 L84 14 L100 52 L112 26 L124 26 L132 8 L144 40 H240"
+          stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="badge">International Society · Founded 2015</span>
+      <h1>Our team</h1>
+      <p class="lede">EBNEO is led by an international Executive Board of neonatologists and researchers,
+        and was established by its founding chairs in 2015. The people below guide the society's
+        evidence mission across more than ten countries.</p>
+    </div>
+
+    <h2 id="board" class="section"><Icon name="users" />Executive Board</h2>
+    <p class="section-sub">Neonatologists and researchers guiding the society's evidence mission.</p>
+    <div class="grid board">
+      {board.members.map((p) => <PersonCard {...p} />)}
+    </div>
+
+    <h2 class="section"><Icon name="award" />Founders &amp; Past Board Chairs</h2>
+    <p class="section-sub">The clinicians who established EBNEO.</p>
+    <div class="grid board">
+      {founders.members.map((p) => <PersonCard {...p} />)}
+    </div>
+  </section>
+</Base>

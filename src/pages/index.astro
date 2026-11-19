@@ -1,9 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import PersonCard from '../components/PersonCard.astro';
-import board from '../data/board.json';
-import founders from '../data/founders.json';
 import { getCollection } from 'astro:content';
 
 const commentaries = (await getCollection('commentaries')).filter(
@@ -41,16 +38,13 @@ const total = commentaries.length;
       <div class="goal"><Icon name="check" /><p>Facilitate research on diagnostic procedures and interventions for important clinical outcomes.</p></div>
     </div>
 
-    <h2 id="board" class="section"><Icon name="users" />Executive Board</h2>
-    <p class="section-sub">Neonatologists and researchers guiding the society's evidence mission.</p>
-    <div class="grid board">
-      {board.members.map((p) => <PersonCard {...p} />)}
-    </div>
-
-    <h2 class="section"><Icon name="award" />Founders &amp; Past Board Chairs</h2>
-    <p class="section-sub">The clinicians who established EBNEO.</p>
-    <div class="grid board">
-      {founders.members.map((p) => <PersonCard {...p} />)}
+    <h2 class="section"><Icon name="users" />Led by an international board</h2>
+    <p class="section-sub">Neonatologists and researchers from more than ten countries guide the
+      society's evidence mission.</p>
+    <div class="box">
+      <p style="margin-bottom:0;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <a class="btn" href="/team/"><Icon name="users" />Meet the Executive Board &amp; founders</a>
+      </p>
     </div>
   </section>
 </Base>
