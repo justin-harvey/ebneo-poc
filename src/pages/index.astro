@@ -1,12 +1,25 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import ReviewCard from '../components/ReviewCard.astro';
 import { getCollection } from 'astro:content';
 
 const commentaries = (await getCollection('commentaries')).filter(
   (c) => c.data.status !== 'draft'
 );
 const total = commentaries.length;
+
+// Newest-first teaser so the home page offers easy navigation to recent commentaries.
+const latest = commentaries
+  .map((c) => ({
+    title: c.data.title,
+    slug: c.slug,
+    investigation: (c.data.investigation || '').trim(),
+    year: c.data.publish_date ? new Date(c.data.publish_date).getUTCFullYear() : null,
+    date: c.data.publish_date ? +new Date(c.data.publish_date) : 0,
+  }))
+  .sort((a, b) => b.date - a.date)
+  .slice(0, 4);
 ---
 <Base>
   <section class="panel">
@@ -28,6 +41,16 @@ const total = commentaries.length;
         <div class="fact"><Icon name="globe" /><b>10+</b><span>Countries represented</span></div>
       </div>
     </div>
+
+    <h2 class="section"><Icon name="activity" />Latest commentaries</h2>
+    <p class="section-sub">The most recent evidence appraisals published on this site.</p>
+    <div class="grid reviews">
+      {latest.map((c) => <ReviewCard {...c} />)}
+    </div>
+    <p style="margin:14px 0 0;display:flex;flex-wrap:wrap;gap:10px">
+      <a class="btn" href="/reviews/"><Icon name="file" />Browse all {total} reviews</a>
+      <a class="btn" href="/rss.xml"><Icon name="activity" />RSS feed</a>
+    </p>
 
     <h2 class="section"><Icon name="award2" />Our goals</h2>
     <p class="section-sub">What the society works toward, every month.</p>

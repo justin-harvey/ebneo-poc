@@ -147,6 +147,10 @@ const years = [...new Set(items.map((i) => i.year).filter(Boolean))].sort((a, b)
 
     count.textContent = `${total} commentaries`;
 
+    // Pre-fill from a ?q= query (schema.org SearchAction target + external deep links).
+    const initialQ = new URLSearchParams(location.search).get('q');
+    if (initialQ) { q.value = initialQ; search(); }
+
     // Load the Pagefind bundle produced at build time (postbuild step).
     import('/pagefind/pagefind.js')
       .then(async (pf) => { await pf.init(); pagefind = pf; if (q.value || inv.value || yr.value) search(); })

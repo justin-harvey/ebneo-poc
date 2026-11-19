@@ -7,6 +7,41 @@ const fullTitle = title ? `${title} · EBNEO` : 'EBNEO · Evidence-Based Neonato
 const desc = description ??
   'The International Society for Evidence-Based Neonatology (EBNEO): appraising the best available evidence to improve care for newborn infants.';
 const ogImage = new URL('/img/ebneo-logo.png', Astro.site).href;
+const siteUrl = (Astro.site?.href ?? 'https://ebneo.org/').replace(/\/$/, '');
+
+// Site-wide structured data: who EBNEO is (MedicalOrganization) + the site + its search action.
+// Facts are already public on the site; no new data is introduced. Per-commentary ScholarlyArticle
+// is a separate, future enhancement (roadmap M9).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': ['Organization', 'MedicalOrganization', 'NGO'],
+      '@id': `${siteUrl}/#organization`,
+      name: 'International Society for Evidence-Based Neonatology',
+      alternateName: 'EBNEO',
+      url: `${siteUrl}/`,
+      logo: ogImage,
+      foundingDate: '2015',
+      nonprofitStatus: 'Nonprofit501c3',
+      identifier: { '@type': 'PropertyValue', propertyID: 'SE-OrgNr', value: '802493-2538' },
+      sameAs: ['https://x.com/ebneo'],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: `${siteUrl}/`,
+      name: 'EBNEO, Evidence-Based Neonatology',
+      publisher: { '@id': `${siteUrl}/#organization` },
+      inLanguage: 'en',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${siteUrl}/reviews/?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  ],
+};
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +59,8 @@ const ogImage = new URL('/img/ebneo-logo.png', Astro.site).href;
   <meta property="og:image" content={ogImage} />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content={ogImage} />
+  <link rel="alternate" type="application/rss+xml" title="EBNEO commentaries" href="/rss.xml" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 </head>
 <body>
   <a class="skip" href="#main">Skip to main content</a>

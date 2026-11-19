@@ -5,3 +5,4 @@ Allow: /
 Disallow: /studio/
 
 Sitemap: https://ebneo.org/sitemap.xml
+# Commentary feed: https://ebneo.org/rss.xml
