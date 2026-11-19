@@ -181,6 +181,10 @@ footer .fnav a{font-size:.92rem}
 footer .fmeta p{color:#9fbccb;font-size:.9rem;line-height:1.55;margin:0 0 4px}
 footer .flink{display:inline-flex;align-items:center;gap:.45em;font-size:.92rem;font-weight:600}
 footer .flink .icon{width:1em;height:1em;color:var(--teal-bright)}
+footer .fsocial{display:flex;flex-wrap:wrap;gap:14px;margin:8px 0 10px}
+footer .fsocial a{color:#9fbccb;line-height:0}
+footer .fsocial a:hover{color:var(--teal-bright)}
+footer .fsocial .icon{width:1.25rem;height:1.25rem}
 footer .frow{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;
   align-items:center;margin-top:30px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1)}
 footer small{color:#7fa6b6;font-size:.82rem}
