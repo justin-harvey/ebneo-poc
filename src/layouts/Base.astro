@@ -9,6 +9,14 @@ const desc = description ??
 const ogImage = new URL('/img/ebneo-logo.png', Astro.site).href;
 const siteUrl = (Astro.site?.href ?? 'https://ebneo.org/').replace(/\/$/, '');
 
+// Analytics: GoatCounter (cookieless, no consent banner needed). Set PUBLIC_GOATCOUNTER_CODE in
+// Netlify once the site is registered at goatcounter.com. Accepts a bare code ("ebneo") or a full
+// endpoint URL. Unset -> no script is emitted, so this is a safe no-op until configured.
+const gcRaw = import.meta.env.PUBLIC_GOATCOUNTER_CODE?.trim();
+const gcEndpoint = gcRaw
+  ? (gcRaw.includes('://') ? gcRaw : `https://${gcRaw}.goatcounter.com/count`)
+  : null;
+
 // Site-wide structured data: who EBNEO is (MedicalOrganization) + the site + its search action.
 // Facts are already public on the site; no new data is introduced. Per-commentary ScholarlyArticle
 // is a separate, future enhancement (roadmap M9).
@@ -76,5 +84,11 @@ const jsonLd = {
     <slot />
   </main>
   <SiteFooter />
+  {gcEndpoint && (
+    <Fragment>
+      <script is:inline>window.goatcounter = { allow_local: false };</script>
+      <script is:inline async src="//gc.zgo.at/count.js" data-goatcounter={gcEndpoint}></script>
+    </Fragment>
+  )}
 </body>
 </html>
